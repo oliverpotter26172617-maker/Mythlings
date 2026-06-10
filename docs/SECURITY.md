@@ -131,3 +131,10 @@ Standing rules enforced across all modules:
   spoofing are impossible.
 - Potential is rolled server-side with the hatch range; no purchase can
   exceed the free-path stat ceiling (unit tested as a build gate).
+
+## Module 4.3: Battle Pass
+
+- Claims send only (tier, track); both are Guard-whitelisted and
+  validated against server-side XP and ownership. Double claims are
+  rejected from profile state.
+- Premium ownership is set exclusively by the receipt processor.

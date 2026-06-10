@@ -17,7 +17,7 @@
 | GATE 1 | Vertical slice status report | DONE (awaiting sign-off) |
 | 4.1 | Products + passes | DONE |
 | 4.2 | Premium Nursery | DONE |
-| 4.3 | Battle Pass | TODO |
+| 4.3 | Battle Pass | DONE |
 | 5.1 | Plots | TODO |
 | 5.2 | Idle income + visiting | TODO |
 | 5.3 | Cosmetics | TODO |

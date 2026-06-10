@@ -73,6 +73,9 @@ local remotes: { [string]: RemoteDef } = {
 
 	-- Buys this week's Premium Nursery offer by slot index.
 	BuyNurseryMythling = { Kind = "Function", Burst = 3, PerMinute = 20 },
+
+	-- Claims a reached Battle Pass tier on the Free or Premium track.
+	ClaimBattlePassTier = { Kind = "Function", Burst = 6, PerMinute = 60 },
 }
 
 return TableUtil.deepFreeze({

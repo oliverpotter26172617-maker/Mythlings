@@ -68,6 +68,9 @@ function RewardsService:ApplyReward(
 		GrowthService:GrantXp(player, mythlingId, result.XpPerMythling)
 	end
 
+	local BattlePassService = require(script.Parent.BattlePassService) :: any
+	BattlePassService:AddBattleXp(player, mode, outcome)
+
 	DataService:Sync(player)
 
 	Net.FireClient("BattleRewards", player, {

@@ -341,3 +341,26 @@ and free-path availability from the Mythic egg.
 Mythic egg's free pool or if a record carries its own stat fields;
 rotation determinism, week-over-week change, Epic/Legendary-only
 offers, and purchase validation (bad index, short Gems, full storage).
+
+---
+
+## Module 4.3: Battle Pass
+
+**Scope:** 50 tiers, free and premium tracks, 8-week seasons, claim UI.
+
+**Design:** season index derives from a configured epoch (no stored
+season state); `ensureSeason` rolls profiles over exactly once and wipes
+prior progress. Pass XP flows through RewardsService for ranked, casual
+and raid outcomes, so every battle feeds the pass from one place.
+Claims validate tier reach, premium ownership and double-claim through
+pure `BattlePassLogic`; rewards grant via the shared Grants lib (egg
+drops fall back to Coins when storage is full). Premium unlocks via the
+799 Robux product receipt (4.1). Progress and claims live in the
+profile, so they persist across sessions by construction.
+
+**Remotes:** ClaimBattlePassTier (burst 6, 60/min).
+
+**Tests:** season boundary maths, single rollover semantics, tier
+mapping with the final-tier cap, XP accumulation, claim-once, unreached
+and premium gating, independent track claims, nonsense tier rejection,
+and both reward tracks fully populated for all 50 tiers.
