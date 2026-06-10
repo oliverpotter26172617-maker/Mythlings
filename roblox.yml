@@ -1,0 +1,167 @@
+---
+# Hand-maintained Roblox standard library for selene.
+# The build environment cannot reach the Roblox API dump endpoint, so this
+# file lists the engine globals Mythlings uses with permissive signatures.
+# Extend it when new engine APIs are introduced.
+base: lua51
+lua_versions:
+  - luau
+globals:
+  game:
+    any: true
+  workspace:
+    any: true
+  script:
+    any: true
+  plugin:
+    any: true
+  task:
+    any: true
+  warn:
+    args:
+      - type: "..."
+  tick:
+    args: []
+  time:
+    args: []
+  elapsedTime:
+    args: []
+  typeof:
+    args:
+      - type: any
+  settings:
+    any: true
+  shared:
+    any: true
+  Instance:
+    any: true
+  Enum:
+    any: true
+  Vector3:
+    any: true
+  Vector2:
+    any: true
+  CFrame:
+    any: true
+  Color3:
+    any: true
+  ColorSequence:
+    any: true
+  ColorSequenceKeypoint:
+    any: true
+  NumberSequence:
+    any: true
+  NumberSequenceKeypoint:
+    any: true
+  NumberRange:
+    any: true
+  UDim:
+    any: true
+  UDim2:
+    any: true
+  Rect:
+    any: true
+  Region3:
+    any: true
+  Ray:
+    any: true
+  RaycastParams:
+    any: true
+  OverlapParams:
+    any: true
+  TweenInfo:
+    any: true
+  Random:
+    any: true
+  BrickColor:
+    any: true
+  PhysicalProperties:
+    any: true
+  Axes:
+    any: true
+  Faces:
+    any: true
+  DateTime:
+    any: true
+  utf8:
+    any: true
+  buffer:
+    any: true
+  bit32:
+    any: true
+  math.clamp:
+    args:
+      - type: number
+      - type: number
+      - type: number
+  math.round:
+    args:
+      - type: number
+  math.sign:
+    args:
+      - type: number
+  math.noise:
+    args:
+      - type: number
+      - type: number
+        required: false
+      - type: number
+        required: false
+  table.find:
+    args:
+      - type: table
+      - type: any
+      - type: number
+        required: false
+  table.create:
+    args:
+      - type: number
+      - type: any
+        required: false
+  table.clear:
+    args:
+      - type: table
+  table.clone:
+    args:
+      - type: table
+  table.freeze:
+    args:
+      - type: table
+  table.isfrozen:
+    args:
+      - type: table
+  table.move:
+    args:
+      - type: table
+      - type: number
+      - type: number
+      - type: number
+      - type: table
+        required: false
+  table.pack:
+    args:
+      - type: "..."
+  table.unpack:
+    args:
+      - type: table
+      - type: number
+        required: false
+      - type: number
+        required: false
+  string.split:
+    method: true
+    args:
+      - type: string
+      - type: string
+        required: false
+  string.pack:
+    args:
+      - type: "..."
+  string.unpack:
+    args:
+      - type: "..."
+  string.packsize:
+    args:
+      - type: string
+  os.clock:
+    args: []

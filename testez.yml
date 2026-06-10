@@ -1,0 +1,23 @@
+---
+globals:
+  describe:
+    args:
+      - type: string
+      - type: function
+  it:
+    args:
+      - type: string
+      - type: function
+  itSKIP:
+    args:
+      - type: string
+      - type: function
+  describeSKIP:
+    args:
+      - type: string
+      - type: function
+  FOCUS:
+    args: []
+  expect:
+    args:
+      - type: any

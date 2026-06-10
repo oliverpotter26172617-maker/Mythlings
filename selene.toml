@@ -1,0 +1,5 @@
+std = "roblox+testez"
+exclude = ["Packages", "tools"]
+
+[lints]
+global_usage = "allow"

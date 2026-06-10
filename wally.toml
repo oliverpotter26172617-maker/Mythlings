@@ -1,0 +1,14 @@
+# Dependencies are vendored into Packages/ because the Wally registry API
+# is not reachable from the build environment. Versions pinned below for
+# reference; refresh by re-vendoring from the upstream repositories.
+[package]
+name = "mythlings/mythlings"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+# ProfileStore = "madstudioroblox/profilestore" (vendored from MadStudioRoblox/ProfileStore main)
+# GoodSignal = "stravant/goodsignal" (vendored from stravant/goodsignal master)
+# Trove = "sleitnick/trove" (vendored from Sleitnick/RbxUtil main)
+# Promise = "evaera/promise@4" (vendored from evaera/roblox-lua-promise master)
