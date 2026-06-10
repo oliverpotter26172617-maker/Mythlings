@@ -232,3 +232,5 @@ Hardening actions taken in this pass:
 - UpdateSetting: key is whitelisted via Guard.oneOf and the value must
   be a boolean; nothing else in the profile is reachable.
 - SeasonRollover and the hub world add no client-writable surface.
+- RequestProfile: no arguments; returns only the caller's own sanitised
+  snapshot (same redactions as ProfileSync). Rate limited at 3 burst.

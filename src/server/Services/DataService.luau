@@ -80,6 +80,16 @@ end
 
 function DataService:OnInit()
 	LiveConfig.start()
+
+	-- Boot-time pull: the join push can race the client's controllers.
+	Net.HandleFunction("RequestProfile", {}, function(player)
+		local data = self:GetData(player)
+		if data == nil then
+			Net.Refuse("Your data is still loading. Please try again shortly.")
+		end
+		return ProfileSanitiser.sanitise(data :: any)
+	end)
+
 	store = ProfileStore.New(STORE_NAME, ProfileSchema.buildTemplate())
 	if RunService:IsStudio() then
 		-- Studio play-tests use the mock store so test data never pollutes

@@ -19,6 +19,10 @@ local remotes: { [string]: RemoteDef } = {
 	-- subsequent deltas. Client never sends on this remote.
 	ProfileSync = { Kind = "Event", Burst = 1, PerMinute = 1 },
 
+	-- Client pull of the current snapshot, used once at boot so a client
+	-- that loaded after the first push still gets its profile promptly.
+	RequestProfile = { Kind = "Function", Burst = 3, PerMinute = 12 },
+
 	-- Buys one egg of a given tier with Coins or Gems (server decides cost).
 	BuyEgg = { Kind = "Function", Burst = 4, PerMinute = 30 },
 

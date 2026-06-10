@@ -18,6 +18,23 @@ function ProfileController:OnStart()
 		snapshot = newSnapshot
 		ProfileController.Changed:Fire(newSnapshot)
 	end)
+
+	-- The join push can land before this controller connects; pull the
+	-- snapshot once at boot, retrying briefly while data loads.
+	task.spawn(function()
+		for _ = 1, 10 do
+			if snapshot ~= nil then
+				return
+			end
+			local response = NetClient.Invoke("RequestProfile")
+			if response.Ok and snapshot == nil then
+				snapshot = response.Data
+				ProfileController.Changed:Fire(response.Data)
+				return
+			end
+			task.wait(1)
+		end
+	end)
 end
 
 function ProfileController:Get(): { [string]: any }?
