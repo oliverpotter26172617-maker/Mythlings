@@ -21,6 +21,15 @@ local remotes: { [string]: RemoteDef } = {
 
 	-- Buys one egg of a given tier with Coins or Gems (server decides cost).
 	BuyEgg = { Kind = "Function", Burst = 4, PerMinute = 30 },
+
+	-- Starts incubating an owned egg in a free slot.
+	StartIncubation = { Kind = "Function", Burst = 4, PerMinute = 30 },
+
+	-- Claims a finished hatch and rolls the Mythling.
+	ClaimHatch = { Kind = "Function", Burst = 4, PerMinute = 30 },
+
+	-- Pays Gems to finish an incubating egg now, then claims it.
+	InstantFinishHatch = { Kind = "Function", Burst = 3, PerMinute = 20 },
 }
 
 return TableUtil.deepFreeze({

@@ -108,3 +108,27 @@ MigrationBackups, PurchaseLedger and every hidden Potential value).
 to 1, or rarities without species. EggShopLogic spec covers insufficient
 Coins/Gems, unknown tier, storage full and exact cost reporting.
 ProfileSanitiser spec proves Potential never replicates.
+
+---
+
+## Module 1.2: Hatch system
+
+**Scope:** timestamp-based incubation with offline progression, pity
+counters per tier, instant finish for Gems, hatch reveal UI.
+
+**Server/client split:** `HatchService` owns StartIncubation, ClaimHatch
+and InstantFinishHatch (all RemoteFunctions). Eggs store HatchesAt as a
+unix timestamp so progress continues offline and across servers. Rolls use
+`HatchLogic.hatch` with the server RNG; reveal payloads omit Potential.
+Client `HatchController` shows slots, live countdowns (server clock via
+GetServerTimeNow), instant finish cost preview from config, and the reveal.
+
+**Remotes:** StartIncubation, ClaimHatch (burst 4, 30/min),
+InstantFinishHatch (burst 3, 20/min).
+
+**Tests:** 10,000-hatch simulation proves the pity guarantee (max Epic+
+gap stays under the threshold of 50), an unlucky-roll test proves the
+guarantee fires exactly at the threshold, distribution test holds odds
+within 1 point over 100,000 rolls, element bias steers 50% of species
+rolls, instant finish pricing matches ceil(minutes x 0.4) with a 1 Gem
+floor, and MythlingFactory builds correct Hatchling records.

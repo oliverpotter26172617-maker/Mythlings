@@ -45,3 +45,18 @@ Standing rules enforced across all modules:
 - Rate limit: burst 4, 30/min. Spam is throttled and counted.
 - Hidden Potential and server ledgers never reach the client: ProfileSync
   payloads pass through ProfileSanitiser (unit tested).
+
+## Module 1.2: Hatching
+
+- All three hatch remotes take only an eggId string (16 chars max). Eggs
+  are looked up in the caller's own profile, so hatching another player's
+  egg is structurally impossible.
+- Timer cheating: HatchesAt is set server-side from config; ClaimHatch
+  compares against os.time() on the server. The client countdown is
+  cosmetic.
+- InstantFinishHatch computes the Gem cost server-side from time remaining
+  and checks Mythling storage before charging, so Gems cannot be burned on
+  a hatch that would then refuse.
+- Incubation slots and storage limits are enforced from config plus the
+  server-side pass cache, never from client state.
+- Pity counters live in the profile and are only mutated by resolveHatch.

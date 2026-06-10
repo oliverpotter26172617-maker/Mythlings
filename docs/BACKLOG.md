@@ -6,7 +6,7 @@
 | 0.2 | Data layer | DONE |
 | 0.3 | Remote framework | DONE |
 | 1.1 | EggConfig + odds UI | DONE |
-| 1.2 | Hatch system | TODO |
+| 1.2 | Hatch system | DONE |
 | 1.3 | Mythling instancing | TODO |
 | 2.1 | Feeding/XP/stages | TODO |
 | 2.2 | Breeding | TODO |
