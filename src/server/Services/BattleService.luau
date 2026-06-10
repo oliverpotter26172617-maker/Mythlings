@@ -85,6 +85,7 @@ local function buildArena(slot: number): (Model, CFrame, CFrame)
 	floor.Position = origin
 	floor.Material = Enum.Material.Slate
 	floor.Color = Color3.fromRGB(60, 66, 78)
+	floor.CastShadow = false
 	floor.Parent = model
 
 	local padA = origin + Vector3.new(-24, 4, 0)

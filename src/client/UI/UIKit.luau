@@ -14,7 +14,33 @@ function UIKit.create(className: string, props: { [string]: any }, children: { I
 			child.Parent = instance
 		end
 	end
+	if className == "ScreenGui" then
+		UIKit.applyMobileScale(instance)
+	end
 	return instance
+end
+
+-- Mobile scaling: shrinks UI gently on small viewports so offset-sized
+-- buttons stay reachable on phones. Applied to every ScreenGui UIKit makes.
+function UIKit.applyMobileScale(screenGui: ScreenGui)
+	local scale = Instance.new("UIScale")
+	scale.Name = "MobileScale"
+	scale.Parent = screenGui
+
+	local camera = workspace.CurrentCamera
+	local function update()
+		if camera == nil then
+			return
+		end
+		local viewport = camera.ViewportSize
+		local shortest = math.min(viewport.X, viewport.Y)
+		-- 720p and up: full size. Small phones: down to 75%.
+		scale.Scale = math.clamp(shortest / 720, 0.75, 1)
+	end
+	update()
+	if camera then
+		camera:GetPropertyChangedSignal("ViewportSize"):Connect(update)
+	end
 end
 
 UIKit.Palette = {

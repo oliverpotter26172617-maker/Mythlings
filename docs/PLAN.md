@@ -492,3 +492,26 @@ reason and bucketed into IAP/Shop/Gameplay transaction types.
 Onboarding funnel steps were wired in 6.2; battle duration telemetry
 logs per match for pacing dashboards. All analytics calls are
 pcall-guarded and can never break gameplay.
+
+---
+
+## Module 6.5: Performance pass
+
+**Scope:** network, render and UI scaling work within this environment;
+device profiling deferred to the Studio checklist.
+
+**Done:**
+- ProfileSync coalescing: bursts of profile mutations now cost one
+  snapshot push per 0.2s per player instead of one per mutation.
+- Mobile UI scaling: every UIKit ScreenGui carries a viewport-driven
+  UIScale (down to 75% on small phones), updating on viewport changes.
+- Render flags on all dynamically created world parts (follower bodies,
+  furniture, arena floors): CastShadow off, CanTouch/CanQuery off where
+  collision is unused.
+- Already in place from earlier modules: StreamingEnabled, single-part
+  actors with client-owned physics, batched battle events (4/s), stage
+  scale handled by one part resize (LOD-equivalent for placeholder art),
+  billboard MaxDistance 60.
+
+**Deferred to Studio (GATE 2 checklist):** device FPS/memory profile,
+StreamingEnabled radii tuning against real map assets.

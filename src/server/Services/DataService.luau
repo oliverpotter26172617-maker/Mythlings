@@ -160,13 +160,23 @@ function DataService:MutateCurrency(player: Player, currency: string, delta: num
 end
 
 -- Pushes the sanitised profile snapshot to the client. Call after any
--- mutation a player should see reflected in their UI.
+-- mutation a player should see reflected in their UI. Pushes are
+-- coalesced per player so bursts of mutations cost one snapshot.
+local syncPending: { [Player]: boolean } = {}
+
 function DataService:Sync(player: Player)
-	local data = self:GetData(player)
-	if data == nil then
+	if syncPending[player] then
 		return
 	end
-	Net.FireClient("ProfileSync", player, ProfileSanitiser.sanitise(data))
+	syncPending[player] = true
+	task.delay(0.2, function()
+		syncPending[player] = nil
+		local data = self:GetData(player)
+		if data == nil or player.Parent == nil then
+			return
+		end
+		Net.FireClient("ProfileSync", player, ProfileSanitiser.sanitise(data))
+	end)
 end
 
 function DataService:GetBalance(player: Player, currency: string): number?

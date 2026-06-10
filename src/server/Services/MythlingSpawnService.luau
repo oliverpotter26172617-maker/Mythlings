@@ -40,6 +40,9 @@ local function buildActor(player: Player, mythlingId: string, record: { [string]
 	body.Color = Color3.fromRGB(elementColour.R, elementColour.G, elementColour.B)
 	body.Material = if record.Shiny then Enum.Material.Neon else Enum.Material.SmoothPlastic
 	body.CanCollide = false
+	body.CanTouch = false
+	body.CanQuery = false
+	body.CastShadow = false
 	body.Massless = true
 	body.CustomPhysicalProperties = PhysicalProperties.new(0.1, 0, 0)
 	body.Parent = model

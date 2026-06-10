@@ -62,6 +62,8 @@ local function renderFurniture(player: Player, plotModel: Model, data: { [string
 		part.Size = Vector3.new(width * grid, item.Height, depth * grid)
 		part.Color = Color3.fromRGB(121, 134, 203)
 		part.Material = Enum.Material.WoodPlanks
+		part.CastShadow = false
+		part.CanTouch = false
 		-- Placement coordinates address the footprint's min cell; centre
 		-- the part over its cells.
 		part.Position = origin
