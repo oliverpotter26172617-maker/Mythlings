@@ -18,6 +18,7 @@ local BattleSim = require(ReplicatedStorage.Shared.Logic.BattleSim)
 local MatchmakingLogic = require(ReplicatedStorage.Shared.Logic.MatchmakingLogic)
 local TeamLogic = require(ReplicatedStorage.Shared.Logic.TeamLogic)
 local Analytics = require(script.Parent.Parent.Lib.Analytics)
+local LiveConfig = require(script.Parent.Parent.Lib.LiveConfig)
 local Net = require(script.Parent.Parent.Lib.Net)
 
 local BattleService = {}
@@ -297,6 +298,9 @@ function BattleService:OnInit()
 	DataService = require(script.Parent.DataService) :: any
 
 	Net.HandleFunction("JoinQueue", { Guard.oneOf({ "Ranked", "Casual" }) }, function(player, mode)
+		if not LiveConfig.get("MatchmakingEnabled") then
+			Net.Refuse("The arena is briefly closed for maintenance. Please try again soon.")
+		end
 		local data = DataService:GetData(player)
 		if data == nil then
 			Net.Refuse("Your data is still loading. Please try again shortly.")

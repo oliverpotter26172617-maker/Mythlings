@@ -19,6 +19,7 @@ local GoodSignal = require(ReplicatedStorage.Packages.GoodSignal)
 local ProfileSchema = require(ReplicatedStorage.Shared.Logic.ProfileSchema)
 local ProfileSanitiser = require(ReplicatedStorage.Shared.Logic.ProfileSanitiser)
 local Analytics = require(script.Parent.Parent.Lib.Analytics)
+local LiveConfig = require(script.Parent.Parent.Lib.LiveConfig)
 local Net = require(script.Parent.Parent.Lib.Net)
 
 local STORE_NAME = "PlayerData"
@@ -78,6 +79,7 @@ local function onPlayerAdded(player: Player)
 end
 
 function DataService:OnInit()
+	LiveConfig.start()
 	store = ProfileStore.New(STORE_NAME, ProfileSchema.buildTemplate())
 	if RunService:IsStudio() then
 		-- Studio play-tests use the mock store so test data never pollutes

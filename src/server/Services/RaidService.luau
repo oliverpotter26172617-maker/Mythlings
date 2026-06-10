@@ -11,6 +11,7 @@ local RaidConfig = require(ReplicatedStorage.Shared.Config.RaidConfig)
 local BattleSim = require(ReplicatedStorage.Shared.Logic.BattleSim)
 local RaidLogic = require(ReplicatedStorage.Shared.Logic.RaidLogic)
 local TeamLogic = require(ReplicatedStorage.Shared.Logic.TeamLogic)
+local LiveConfig = require(script.Parent.Parent.Lib.LiveConfig)
 local Net = require(script.Parent.Parent.Lib.Net)
 
 local RaidService = {}
@@ -186,6 +187,9 @@ function RaidService:OnInit()
 	RewardsService = require(script.Parent.RewardsService) :: any
 
 	Net.HandleFunction("JoinRaid", {}, function(player)
+		if not LiveConfig.get("RaidsEnabled") then
+			Net.Refuse("Raids are briefly unavailable. Please try again soon.")
+		end
 		local data = DataService:GetData(player)
 		if data == nil then
 			Net.Refuse("Your data is still loading. Please try again shortly.")

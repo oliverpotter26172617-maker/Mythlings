@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local MonetisationConfig = require(ReplicatedStorage.Shared.Config.MonetisationConfig)
 local MonetisationLogic = require(ReplicatedStorage.Shared.Logic.MonetisationLogic)
+local LiveConfig = require(script.Parent.Parent.Lib.LiveConfig)
 
 local MonetisationService = {}
 
@@ -52,6 +53,11 @@ local function grantVipStipend(player: Player)
 end
 
 local function processReceipt(receiptInfo: { [string]: any }): Enum.ProductPurchaseDecision
+	-- Kill switch: hold receipts unprocessed (Roblox redelivers them
+	-- later) rather than dropping paid purchases.
+	if not LiveConfig.get("PurchasesEnabled") then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
 	local player = Players:GetPlayerByUserId(receiptInfo.PlayerId)
 	if player == nil then
 		return Enum.ProductPurchaseDecision.NotProcessedYet

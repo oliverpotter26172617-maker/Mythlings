@@ -44,3 +44,18 @@ Robux products are the four Gem packs and the Battle Pass premium
 unlock. A direct "instant hatch" Robux product would need a purchase
 context handshake; deferred unless wanted. Raids are freely retryable,
 so a paid raid retry has nothing to unlock; omitted.
+
+## 6.6 Under-13 spend prompt
+
+The spec asks for a daily Gem spend soft-cap prompt "for accounts
+flagged under 13 by Roblox APIs where available". Roblox does not expose
+age signals to experience code (by design), so a compliant in-game age
+gate is not implementable. Shipped without it; Roblox parental spend
+controls cover the protection. If Roblox ships an age-signal API, wire
+it into a spend tracker in MonetisationService.
+
+## 6.6 Soft-launch region limit
+
+In-server matchmaking has no region dimension; the soft-launch flag
+exists in LaunchConfig and region/audience limiting happens through
+place visibility settings on the dashboard.

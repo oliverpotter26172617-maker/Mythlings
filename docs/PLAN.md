@@ -515,3 +515,19 @@ device profiling deferred to the Studio checklist.
 
 **Deferred to Studio (GATE 2 checklist):** device FPS/memory profile,
 StreamingEnabled radii tuning against real map assets.
+
+---
+
+## Module 6.6: Launch checklist
+
+**Scope:** launch copy, policy compliance notes, asset id wiring steps,
+soft-launch flag and live kill switches.
+
+**Design:** `LaunchConfig` holds operational defaults; `LiveConfig`
+polls a DataStore document every 60s so flags flip across the fleet
+without a redeploy. Kill switches wired: PurchasesEnabled holds receipts
+unprocessed (Roblox redelivers, no paid purchase is dropped),
+BreedingEnabled, MatchmakingEnabled and RaidsEnabled refuse politely at
+their remotes. docs/LAUNCH-CHECKLIST.md carries the listing copy,
+odds-policy description, age questionnaire notes, dashboard wiring and
+the manual Studio verification list.

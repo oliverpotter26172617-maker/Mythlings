@@ -10,6 +10,7 @@ local MythlingConfig = require(ReplicatedStorage.Shared.Config.MythlingConfig)
 local PlayerConfig = require(ReplicatedStorage.Shared.Config.PlayerConfig)
 local BreedingLogic = require(ReplicatedStorage.Shared.Logic.BreedingLogic)
 local Guard = require(ReplicatedStorage.Shared.Logic.Guard)
+local LiveConfig = require(script.Parent.Parent.Lib.LiveConfig)
 local Net = require(script.Parent.Parent.Lib.Net)
 
 local BreedingService = {}
@@ -33,6 +34,9 @@ function BreedingService:OnInit()
 	DataService = require(script.Parent.DataService) :: any
 
 	Net.HandleFunction("BreedMythlings", { Guard.string(16), Guard.string(16) }, function(player, idA, idB)
+		if not LiveConfig.get("BreedingEnabled") then
+			Net.Refuse("Breeding is briefly unavailable. Please try again later.")
+		end
 		local data = getDataOrRefuse(player)
 		local now = os.time()
 
