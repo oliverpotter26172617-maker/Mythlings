@@ -103,7 +103,8 @@ function GrowthService:OnInit()
 		end
 
 		data.Inventory.Food[foodId] = owned - 1
-		record.LastFedAt = os.time()
+		record.LastFedAt = os.time();
+		(require(script.Parent.QuestService) :: any):ReportProgress(player, "MythlingsFed", 1)
 		local result = GrowthService:GrantXp(player, mythlingId, food.Xp)
 
 		DataService:Sync(player)

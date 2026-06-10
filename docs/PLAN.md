@@ -433,3 +433,28 @@ BuyArenaShopItem.
 **Tests:** whitelist build gate, team/battle identity with cosmetics,
 buy and equip validation across layers and slots, shop rotation and
 pool reference integrity.
+
+---
+
+## Module 6.1: Quests, calendar, gifting, group bonus
+
+**Scope:** 3 daily and 5 weekly quests, 7-day escalating login calendar
+(day 7 guaranteed Epic egg), friend gifting (1 Basic egg per friend per
+day) and the +10% group membership Coin bonus.
+
+**Design:** quest sets roll deterministically from the day/week stamp
+(no stored RNG state); progress flows through QuestService:ReportProgress
+from battles, hatches, feeds, breeds, income claims and gifts; claims
+validate and grant via the shared Grants lib. The calendar auto-claims on
+the first join of each UTC day; day 7 grants a sealed Epic-outcome egg.
+The group bonus folds into the single coinMultiplier alongside VIP and
+caches on join (GroupId ships as 0 until the real group exists). All
+quest state persists in the profile.
+
+**Remotes:** ClaimQuest, GiftEgg, CalendarReward (server to client).
+
+**Tests:** deterministic rolling and reroll-on-stamp-change, metric
+progress with target caps, claim-once and unfinished/unknown refusals,
+no progress on claimed quests, calendar once-per-day cycling through all
+seven days with day 7 as the Epic egg, and per-friend-per-day gifting
+with daily reset.

@@ -247,8 +247,9 @@ function HousingService:OnInit()
 			Net.Refuse("Your Mythlings have not earned anything yet. Keep them housed and fed!")
 		end
 		-- VIP boosts Coin sources, idle income included.
-		coins = math.floor(coins * MonetisationLogic.coinMultiplier(data.Passes))
-		DataService:MutateCurrency(player, "Coins", coins, "PlotIncome")
+		coins = math.floor(coins * MonetisationLogic.coinMultiplier(data))
+		DataService:MutateCurrency(player, "Coins", coins, "PlotIncome");
+		(require(script.Parent.QuestService) :: any):ReportProgress(player, "IncomeCollected", 1)
 		DataService:Sync(player)
 		return { Coins = coins }
 	end)

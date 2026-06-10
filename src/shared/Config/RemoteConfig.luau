@@ -87,6 +87,13 @@ local remotes: { [string]: RemoteDef } = {
 	ClaimPlotIncome = { Kind = "Function", Burst = 3, PerMinute = 20 },
 	VisitFriendPlot = { Kind = "Function", Burst = 3, PerMinute = 20 },
 
+	-- Quests, calendar and gifting.
+	ClaimQuest = { Kind = "Function", Burst = 6, PerMinute = 60 },
+	GiftEgg = { Kind = "Function", Burst = 3, PerMinute = 20 },
+
+	-- Server -> client: login calendar reward toast.
+	CalendarReward = { Kind = "Event", Burst = 1, PerMinute = 1 },
+
 	-- Cosmetics: Gem purchases, equipping and the Battle Token shop.
 	BuyCosmetic = { Kind = "Function", Burst = 4, PerMinute = 30 },
 	EquipAvatarCosmetic = { Kind = "Function", Burst = 6, PerMinute = 60 },

@@ -165,3 +165,13 @@ Standing rules enforced across all modules:
   (enforced by a same-seed battle identity test).
 - Arena Shop purchases resolve the entry from the server-derived weekly
   rotation; only a slot index crosses the wire.
+
+## Module 6.1: Quests and gifting
+
+- Quest claims validate scope, activity, completion and double-claim
+  server-side; quest selection is deterministic so clients cannot
+  influence rolls.
+- GiftEgg requires Roblox friendship, presence in the server and the
+  per-friend daily cap recorded on the giver before granting. The
+  receiver's storage limits apply through Grants (Coins fallback).
+- The group bonus flag is set only from a server-side IsInGroup check.

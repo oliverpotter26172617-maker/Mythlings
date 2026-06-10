@@ -72,6 +72,7 @@ function BreedingService:OnInit()
 		}
 
 		data.Stats.TotalBreeds += 1
+		(require(script.Parent.QuestService) :: any):ReportProgress(player, "MythlingsBred", 1)
 		DataService:Sync(player)
 
 		-- The surprise stays sealed: no species or rarity in the response.

@@ -84,6 +84,10 @@ local function resolveHatch(player: Player, data: { [string]: any }, eggId: stri
 		Net.Refuse("Your Mythling storage is full.")
 	end
 
+	-- Past the storage check the hatch always succeeds.
+	local QuestService = require(script.Parent.QuestService) :: any
+	QuestService:ReportProgress(player, "EggsHatched", 1)
+
 	if egg.Outcome ~= nil then
 		local outcome = egg.Outcome
 		data.Eggs[eggId] = nil

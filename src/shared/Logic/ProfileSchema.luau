@@ -96,10 +96,28 @@ function ProfileSchema.buildTemplate(): { [string]: any }
 			LowQuality = PlayerConfig.DefaultSettings.LowQuality,
 		},
 
+		Quests = {
+			DayStamp = -1,
+			WeekStamp = -1,
+			Daily = {},
+			Weekly = {},
+		},
+
+		LoginCalendar = {
+			LastClaimDay = -1,
+			DayIndex = 0,
+		},
+
+		Gifts = {
+			DayStamp = -1,
+			Given = {},
+		},
+
 		Flags = {
 			OnboardingStep = 0,
 			StarterEggGranted = false,
 			LastVipStipendDay = 0,
+			GroupBonus = false,
 		},
 
 		MigrationBackups = {},

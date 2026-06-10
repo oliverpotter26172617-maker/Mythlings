@@ -46,7 +46,7 @@ function RewardsService:ApplyReward(
 	})
 
 	-- VIP boosts Coin sources (the table's base values stay untouched).
-	local coins = math.floor(result.Coins * MonetisationLogic.coinMultiplier(data.Passes))
+	local coins = math.floor(result.Coins * MonetisationLogic.coinMultiplier(data))
 	if coins > 0 then
 		DataService:MutateCurrency(player, "Coins", coins, `Battle:{mode}:{outcome}`)
 	end
@@ -70,6 +70,18 @@ function RewardsService:ApplyReward(
 
 	local BattlePassService = require(script.Parent.BattlePassService) :: any
 	BattlePassService:AddBattleXp(player, mode, outcome)
+
+	local QuestService = require(script.Parent.QuestService) :: any
+	QuestService:ReportProgress(player, "BattlesPlayed", 1)
+	if outcome == "Win" then
+		QuestService:ReportProgress(player, "BattlesWon", 1)
+		if mode == "Raid" then
+			QuestService:ReportProgress(player, "RaidsCleared", 1)
+		end
+	end
+	if result.BattleTokens > 0 then
+		QuestService:ReportProgress(player, "TokensEarned", result.BattleTokens)
+	end
 
 	DataService:Sync(player)
 

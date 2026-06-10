@@ -25,11 +25,20 @@ function MonetisationLogic.applyReceiptOnce(
 end
 
 -- Coin source multiplier from owned passes (battle rewards, idle income).
-function MonetisationLogic.coinMultiplier(passes: { [string]: any }): number
+-- Accepts either the Passes table alone or the full profile data (to also
+-- apply the group membership bonus).
+function MonetisationLogic.coinMultiplier(passesOrData: { [string]: any }): number
+	local passes = passesOrData.Passes or passesOrData
+	local flags = passesOrData.Flags or {}
+	local multiplier = 1
 	if passes.VIP then
-		return MonetisationConfig.VipCoinMultiplier
+		multiplier *= MonetisationConfig.VipCoinMultiplier
 	end
-	return 1
+	if flags.GroupBonus then
+		local QuestConfig = require(script.Parent.Parent.Config.QuestConfig)
+		multiplier *= (1 + QuestConfig.GroupCoinBonus)
+	end
+	return multiplier
 end
 
 -- Incubation seconds after pass discounts.
