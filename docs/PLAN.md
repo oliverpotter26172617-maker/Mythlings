@@ -62,3 +62,24 @@ newer-version profiles, missing-step failure, and reversible field backups.
 **Smoke note:** join/leave/rejoin round-trip and BindToClose flush rely on
 ProfileStore's session lock and internal BindToClose hook; verify in Studio
 with the mock store (auto-selected when RunService:IsStudio()).
+
+---
+
+## Module 0.3: Remote framework
+
+**Scope:** typed remote wrapper with registration, per-player token-bucket
+rate limits and Guard argument validation middleware.
+
+**Server/client split:** `server/Lib/Net` creates remotes from
+`Config/RemoteConfig` (unknown names are a hard error), wraps handlers with
+rate limit + validation + violation logging, and envelopes every
+RemoteFunction response as { Ok, Data?, Error? }. `client/Lib/NetClient`
+mirrors it. Pure logic extracted to `Logic/RateLimiter` (token bucket,
+injectable clock) and `Logic/Guard` (validators).
+
+**Remotes created:** ProfileSync (server to client only).
+
+**Tests:** RateLimiter spec proves a 100-call spam burst is cut to the
+configured burst capacity, refill over time, per-key independence and
+backwards-clock robustness. Guard spec covers NaN/infinity rejection,
+ranges, enums, oversized payload bombs and tuple validation.

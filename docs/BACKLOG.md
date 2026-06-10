@@ -4,7 +4,7 @@
 |--------|------|--------|
 | 0.1 | Project scaffold | DONE |
 | 0.2 | Data layer | DONE |
-| 0.3 | Remote framework | TODO |
+| 0.3 | Remote framework | DONE |
 | 1.1 | EggConfig + odds UI | TODO |
 | 1.2 | Hatch system | TODO |
 | 1.3 | Mythling instancing | TODO |

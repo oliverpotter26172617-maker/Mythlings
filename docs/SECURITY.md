@@ -15,3 +15,23 @@ Standing rules enforced across all modules:
   runtime.
 
 (Entries are appended per module from 0.3 onward.)
+
+## Module 0.3: Remote framework
+
+- Remotes can only exist if declared in `RemoteConfig` with an explicit
+  burst and per-minute rate. `Net.HandleEvent`/`Net.HandleFunction` reject
+  unregistered names at boot, so a rogue remote cannot ship unnoticed.
+- Spam: token bucket per `remote:userId`. Throttled calls are dropped
+  (Events) or answered with a polite refusal (Functions), and counted via
+  `Net.GetViolationCounts()` for the hardening audit in 6.4.
+- Garbage payloads: Guard validators reject wrong types, NaN/infinity,
+  out-of-range numbers, oversized strings/tables/arrays and extra arguments
+  before any handler runs.
+- Spoofed identity: the acting player is the first parameter from
+  OnServerEvent/OnServerInvoke. Handlers never accept a player or UserId
+  from the argument list as the actor.
+- Handler crashes are caught; RemoteFunctions return a generic error so
+  internal messages never leak to clients. Intentional refusals use
+  Net.Refuse, which is the only path for player-visible reasons.
+- ProfileSync: server to client push only; the server attaches no
+  OnServerEvent listener, so client sends on it are inert.
