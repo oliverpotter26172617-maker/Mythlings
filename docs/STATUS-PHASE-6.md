@@ -67,3 +67,20 @@ in code:
 Code-complete launch candidate. Remaining work is asset production,
 dashboard wiring and the manual Studio pass, none of which is agent
 codework in this environment.
+
+## Post-gate addendum (same day)
+
+Four follow-up commits after the gate, closing playability gaps found in
+a final review:
+
+- Hub world with spawn plaza and landmarks (players previously had no
+  map to stand on), persistent currency/trophy HUD, and the collection
+  screen that sets the follower/arena team (the missing core-loop UI).
+- Seasonal trophy soft reset with bracket placement Gems (spec 3.10).
+- GitHub Actions CI running lint, format, all 197 tests and a place
+  build on every push.
+- Critter-styled actor models, authoritative battle HP bars, persisted
+  settings, and a fix for the boot race where the first profile push
+  could beat the client's listeners.
+
+Final state: 28 commits, 197 tests green, CI in place.
