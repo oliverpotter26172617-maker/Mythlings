@@ -60,6 +60,9 @@ local remotes: { [string]: RemoteDef } = {
 	BattleStart = { Kind = "Event", Burst = 1, PerMinute = 1 },
 	BattleEvents = { Kind = "Event", Burst = 1, PerMinute = 1 },
 	BattleEnd = { Kind = "Event", Burst = 1, PerMinute = 1 },
+
+	-- Server -> client: itemised payout after a battle.
+	BattleRewards = { Kind = "Event", Burst = 1, PerMinute = 1 },
 }
 
 return TableUtil.deepFreeze({

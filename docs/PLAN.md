@@ -254,3 +254,22 @@ priority, leftovers, and TeamLogic team building and refusals.
 
 **Smoke note:** two-client end-to-end ranked battle needs Studio
 multi-client testing; logged for the GATE 1 report.
+
+---
+
+## Module 3.3: Rewards engine
+
+**Scope:** Section 3.6 payout table, exactly, including streak bonus and
+loss protection.
+
+**Design:** `RewardsLogic.compute` is pure: coins (bracket multiplier and
++10%/win streak bonus capped at +50% for ranked wins), trophies (+25..35
+win, -10..20 loss with a floor of 0), XP fractions (full/40%), Battle
+Tokens per row, streak bookkeeping and loss protection (0 trophy cost on
+losses after 3 straight). Draws pay the loss consolation with frozen
+streaks. `RewardsService` listens to MatchEnded, applies the payout
+through the audited currency gateway, grants team XP via
+GrowthService:GrantXp and pushes an itemised BattleRewards event.
+
+**Tests:** one describe block per table row plus streak cap, trophy
+floor, loss protection activation and draw handling (15 assertions).

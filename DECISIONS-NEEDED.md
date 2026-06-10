@@ -24,3 +24,14 @@ without naming the pairs. Shipped (in `BattleConfig.Wheel`):
 Flame beats Terra, Terra beats Storm, Storm beats Tide, Tide beats Flame,
 and Shadow and Radiant beat each other. Every element has exactly one
 advantage (enforced by a unit test).
+
+## 3.3 Reward edge interpretations
+
+- Win streak bonus reads "+10% per streak, caps at +50%": implemented as
+  +10% per consecutive win before this one (first win of a run has no
+  bonus; the cap lands from the sixth consecutive win).
+- Loss protection reads "after 3 straight losses, next loss costs 0":
+  implemented as every loss while the streak stays at 3+ costs 0 until a
+  win resets it (the player-friendly reading).
+- Draws (dead-even timeout) pay the loss consolation row, move no
+  trophies and freeze both streaks.

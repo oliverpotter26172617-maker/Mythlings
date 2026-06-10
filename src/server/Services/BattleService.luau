@@ -43,6 +43,7 @@ type Match = {
 	ArenaSlot: number,
 	ReturnCFrames: { [Player]: CFrame },
 	Powers: { [Player]: number },
+	TeamMythlings: { [Player]: { string } },
 }
 
 local queues: { [string]: { [Player]: QueueRecord } } = { Ranked = {}, Casual = {} }
@@ -154,6 +155,7 @@ local function endMatch(match: Match, winnerTeam: number, forfeitedBy: Player?)
 		Winner = winnerTeam,
 		Duration = duration,
 		Powers = match.Powers,
+		TeamMythlings = match.TeamMythlings,
 		ForfeitedBy = forfeitedBy,
 	})
 end
@@ -200,14 +202,17 @@ local function startMatch(mode: string, recordA: QueueRecord, recordB: QueueReco
 		ArenaSlot = slot,
 		ReturnCFrames = {},
 		Powers = { [playerA] = buildA.Power :: number, [playerB] = buildB.Power :: number },
+		TeamMythlings = { [playerA] = {}, [playerB] = {} },
 	}
 	nextMatchId += 1
 
 	for _, unit in buildA.Units :: any do
 		match.UnitOwners[unit.Id] = playerA
+		table.insert(match.TeamMythlings[playerA], unit.MythlingId)
 	end
 	for _, unit in buildB.Units :: any do
 		match.UnitOwners[unit.Id] = playerB
+		table.insert(match.TeamMythlings[playerB], unit.MythlingId)
 	end
 
 	queues[mode][playerA] = nil
