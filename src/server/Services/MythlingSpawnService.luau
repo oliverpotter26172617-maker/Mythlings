@@ -184,6 +184,9 @@ function MythlingSpawnService:OnInit()
 
 			data.ActiveMythlings = table.clone(mythlingIds)
 			MythlingSpawnService:RefreshFollowers(player)
+			if #mythlingIds > 0 then
+				(require(script.Parent.QuestService) :: any):ReportProgress(player, "TeamSet", 1)
+			end
 			DataService:Sync(player)
 			return { Count = #mythlingIds }
 		end

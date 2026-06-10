@@ -458,3 +458,23 @@ progress with target caps, claim-once and unfinished/unknown refusals,
 no progress on claimed quests, calendar once-per-day cycling through all
 seven days with day 7 as the Epic egg, and per-friend-per-day gifting
 with daily reset.
+
+---
+
+## Module 6.2: Onboarding
+
+**Scope:** guided new-player flow ending in the free Rare egg hatch and
+a first casual battle, with funnel analytics at every step.
+
+**Design:** the free Rare egg (sealed Rare outcome, 2 minute hatch)
+lands the moment a fresh profile loads. Steps complete from the same
+metric pipeline quests use (hatch, feed, set team, battle), so there is
+one reporting path; completion grants 500 Coins towards the session-one
+earnings target. Every step transition logs to the Roblox onboarding
+funnel via the pcall-guarded Analytics wrapper, so analytics can never
+break gameplay. A client banner shows the current step until the flow
+ends.
+
+**Tests:** flow start semantics, ordered walk to completion, immunity
+to out-of-order and unknown metrics, completed/unstarted no-ops, and
+config sanity (every actionable step has a completion metric).

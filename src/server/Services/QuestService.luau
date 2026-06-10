@@ -48,7 +48,9 @@ function QuestService:ReportProgress(player: Player, metric: string, amount: num
 		return
 	end
 	QuestLogic.ensureQuests(data, os.time())
-	QuestLogic.report(data, metric, amount)
+	QuestLogic.report(data, metric, amount);
+	-- Onboarding rides the same metric pipeline.
+	(require(script.Parent.OnboardingService) :: any):OnMetric(player, metric)
 	DataService:Sync(player)
 end
 
