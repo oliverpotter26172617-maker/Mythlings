@@ -10,6 +10,8 @@ local HousingConfig = require(ReplicatedStorage.Shared.Config.HousingConfig)
 local MonetisationConfig = require(ReplicatedStorage.Shared.Config.MonetisationConfig)
 local Guard = require(ReplicatedStorage.Shared.Logic.Guard)
 local HousingLogic = require(ReplicatedStorage.Shared.Logic.HousingLogic)
+local IncomeLogic = require(ReplicatedStorage.Shared.Logic.IncomeLogic)
+local MonetisationLogic = require(ReplicatedStorage.Shared.Logic.MonetisationLogic)
 local Net = require(script.Parent.Parent.Lib.Net)
 
 local HousingService = {}
@@ -237,6 +239,59 @@ function HousingService:OnInit()
 		end
 	)
 
+	Net.HandleFunction("ClaimPlotIncome", {}, function(player)
+		local data = getDataOrRefuse(player)
+		local coins = IncomeLogic.claim(data, os.time())
+		if coins <= 0 then
+			DataService:Sync(player)
+			Net.Refuse("Your Mythlings have not earned anything yet. Keep them housed and fed!")
+		end
+		-- VIP boosts Coin sources, idle income included.
+		coins = math.floor(coins * MonetisationLogic.coinMultiplier(data.Passes))
+		DataService:MutateCurrency(player, "Coins", coins, "PlotIncome")
+		DataService:Sync(player)
+		return { Coins = coins }
+	end)
+
+	Net.HandleFunction("VisitFriendPlot", { Guard.integer(1) }, function(player, friendUserId)
+		local data = getDataOrRefuse(player)
+		if friendUserId == player.UserId then
+			Net.Refuse("You are already home!")
+		end
+
+		local friend = Players:GetPlayerByUserId(friendUserId)
+		if friend == nil or plotSlots[friend] == nil then
+			Net.Refuse("That friend is not in this server.")
+		end
+
+		local isFriend = false
+		local ok, result = pcall(player.IsFriendsWith, player, friendUserId)
+		if ok then
+			isFriend = result
+		end
+		if not isFriend then
+			Net.Refuse("You can only visit Roblox friends.")
+		end
+
+		-- Teleport the visitor onto the friend's plot.
+		local character = player.Character
+		local rootPart = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+		local origin = slotOrigin(plotSlots[friend] :: number)
+		if rootPart then
+			rootPart.CFrame = CFrame.new(origin + Vector3.new(0, 6, 0))
+		end
+
+		-- Daily bonus for both, once per pair per day (visitor-tracked).
+		local granted, message = IncomeLogic.tryRecordVisit(data, friendUserId, os.time())
+		if granted then
+			DataService:MutateCurrency(player, "Coins", HousingConfig.VisitBonusCoins, "VisitBonus:Visitor")
+			DataService:MutateCurrency(friend, "Coins", HousingConfig.VisitBonusCoins, "VisitBonus:Host")
+			DataService:Sync(player)
+			DataService:Sync(friend)
+		end
+		return { Visited = friend.DisplayName, BonusGranted = granted, Message = message }
+	end)
+
 	Net.HandleFunction("RemoveFurniture", { Guard.string(16) }, function(player, guid)
 		local data = getDataOrRefuse(player)
 		local placement = data.Housing.Furniture[guid]
@@ -257,6 +312,11 @@ end
 
 function HousingService:OnStart()
 	DataService.ProfileLoaded:Connect(function(player)
+		-- Start the idle income clock for brand new profiles.
+		local data = DataService:GetData(player)
+		if data and data.Housing.LastIncomeClaimAt == 0 then
+			data.Housing.LastIncomeClaimAt = os.time()
+		end
 		-- Allocate the first free slot.
 		for slot = 1, 200 do
 			if not usedSlots[slot] then

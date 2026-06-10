@@ -103,6 +103,7 @@ function GrowthService:OnInit()
 		end
 
 		data.Inventory.Food[foodId] = owned - 1
+		record.LastFedAt = os.time()
 		local result = GrowthService:GrantXp(player, mythlingId, food.Xp)
 
 		DataService:Sync(player)

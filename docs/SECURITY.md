@@ -149,3 +149,11 @@ Standing rules enforced across all modules:
   structurally impossible.
 - Theme equipping checks ownership server-side; the VIP exclusive theme
   is only equippable while the VIP pass is cached true.
+
+## Module 5.2: Income + visiting
+
+- Income windows are server timestamps; claiming twice pays zero (unit
+  tested). Rates come from config and the player's own roster.
+- Visit bonuses require the target to be a Roblox friend present in the
+  server; the once-per-pair-per-day ledger lives in the visitor profile
+  so bonus farming with alt hopping is capped at 5 per day.

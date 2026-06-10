@@ -386,3 +386,25 @@ including extreme coordinates, the same spot legalises after an upgrade,
 off-grid and bad rotations refuse, overlap versus adjacency, rotated
 footprint swapping, tier caps, upgrade fund/top-tier validation and
 theme purchase rules (VIP exclusivity included).
+
+---
+
+## Module 5.2: Idle income + visiting
+
+**Scope:** housed Mythlings generate Coins, doubled while recently fed;
+friend-visit daily bonus for both players.
+
+**Design:** pure `IncomeLogic`: income accrues per housed (active roster)
+Mythling at config rates by rarity, doubled within the 24h fed window
+(never-fed Mythlings never qualify), capped at 12 hours unclaimed.
+`claim` stamps the window so the same period can never pay twice; the
+first ever claim starts the clock without paying. Visits pay both
+players once per distinct friend per UTC day, visitor-capped at 5/day,
+validated against Roblox friendship server-side. VIP multiplies the
+income payout. Feeding now stamps LastFedAt.
+
+**Remotes:** ClaimPlotIncome, VisitFriendPlot (burst 3, 20/min each).
+
+**Tests:** exact config-rate accrual, fed doubling, the 12 hour cap,
+unowned Mythlings paying nothing, double-claim paying zero, first-claim
+clock start, per-friend-per-day visits with the daily cap and reset.

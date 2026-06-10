@@ -19,7 +19,7 @@
 | 4.2 | Premium Nursery | DONE |
 | 4.3 | Battle Pass | DONE |
 | 5.1 | Plots | DONE |
-| 5.2 | Idle income + visiting | TODO |
+| 5.2 | Idle income + visiting | DONE |
 | 5.3 | Cosmetics | TODO |
 | 6.1 | Quests + calendar + gifting + group bonus | TODO |
 | 6.2 | Onboarding | TODO |
