@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BattlePassConfig = require(ReplicatedStorage.Shared.Config.BattlePassConfig)
 local BattlePassLogic = require(ReplicatedStorage.Shared.Logic.BattlePassLogic)
+local SeasonLogic = require(ReplicatedStorage.Shared.Logic.SeasonLogic)
 local Guard = require(ReplicatedStorage.Shared.Logic.Guard)
 local Grants = require(script.Parent.Parent.Lib.Grants)
 local Net = require(script.Parent.Parent.Lib.Net)
@@ -67,7 +68,21 @@ function BattlePassService:OnStart()
 	DataService.ProfileLoaded:Connect(function(player)
 		local data = DataService:GetData(player)
 		if data then
-			if BattlePassLogic.ensureSeason(data, BattlePassLogic.seasonIndex(os.time())) then
+			local season = BattlePassLogic.seasonIndex(os.time())
+
+			-- Seasonal trophy rollover with placement rewards (3.10).
+			local rollover = SeasonLogic.applyRollover(data, season)
+			if rollover ~= nil and rollover.PlacementGems > 0 then
+				DataService:MutateCurrency(
+					player,
+					"Gems",
+					rollover.PlacementGems,
+					`SeasonPlacement:{rollover.Placement}`
+				)
+				Net.FireClient("SeasonRollover", player, rollover)
+			end
+
+			if BattlePassLogic.ensureSeason(data, season) or rollover ~= nil then
 				DataService:Sync(player)
 			end
 		end

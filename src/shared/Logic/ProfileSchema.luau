@@ -63,6 +63,7 @@ function ProfileSchema.buildTemplate(): { [string]: any }
 		Stats = {
 			Trophies = 0,
 			SeasonHighestTrophies = 0,
+			LastSeason = 0,
 			BattlesWon = 0,
 			BattlesLost = 0,
 			WinStreak = 0,

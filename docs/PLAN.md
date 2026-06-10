@@ -531,3 +531,31 @@ BreedingEnabled, MatchmakingEnabled and RaidsEnabled refuse politely at
 their remotes. docs/LAUNCH-CHECKLIST.md carries the listing copy,
 odds-policy description, age questionnaire notes, dashboard wiring and
 the manual Studio verification list.
+
+---
+
+## Post-gate polish sprint
+
+### P1: Hub world + currency HUD
+WorldService builds a spawn plaza with a SpawnLocation, landmark stalls
+for the shop/hatchery/den/arena and a path towards the neighbourhood,
+plus ambient lighting; without it players spawned into the void.
+HudController shows Coins, Gems, Battle Tokens and Trophies live from
+profile snapshots.
+
+### P2: Collection UI
+CollectionController lists every owned Mythling (rarest first, Shiny
+flagged), lets players pick up to three as followers/arena team via
+SetActiveMythlings, and completes the onboarding SetTeam step. This was
+the missing link in the core loop UI.
+
+### P3: Seasonal trophy reset (spec 3.10)
+SeasonLogic applies a once-per-season rollover aligned to the Battle
+Pass season: placement Gems by final bracket and a 50% trophy soft
+reset, with a client toast. Brand new profiles stamp the season without
+a reward. Unit tested (placement, idempotency, bracket coverage).
+
+### P4: Continuous integration
+GitHub Actions workflow runs selene, StyLua, the full Lune test suite
+and a rojo build on every push and pull request with the pinned
+toolchain versions.

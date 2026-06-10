@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          curl -sL -o rojo.zip https://github.com/rojo-rbx/rojo/releases/download/v7.4.4/rojo-7.4.4-linux-x86_64.zip
+          unzip -o rojo.zip -d "$HOME/.local/bin"
+          curl -sL -o lune.zip https://github.com/lune-org/lune/releases/download/v0.8.9/lune-0.8.9-linux-x86_64.zip
+          unzip -o lune.zip -d "$HOME/.local/bin"
+          curl -sL -o stylua.zip https://github.com/JohnnyMorganz/StyLua/releases/download/v2.0.2/stylua-linux-x86_64.zip
+          unzip -o stylua.zip -d "$HOME/.local/bin"
+          curl -sL -o selene.zip https://github.com/Kampfkarren/selene/releases/download/0.31.0/selene-0.31.0-linux.zip
+          unzip -o selene.zip -d "$HOME/.local/bin"
+          chmod +x "$HOME/.local/bin"/*
+
+      - name: Lint
+        run: selene src/
+
+      - name: Format check
+        run: stylua --check src/ tools/
+
+      - name: Unit tests
+        run: lune run tools/run-tests.luau
+
+      - name: Build place file
+        run: rojo build -o Mythlings.rbxl

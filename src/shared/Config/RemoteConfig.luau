@@ -94,6 +94,9 @@ local remotes: { [string]: RemoteDef } = {
 	-- Server -> client: login calendar reward toast.
 	CalendarReward = { Kind = "Event", Burst = 1, PerMinute = 1 },
 
+	-- Server -> client: seasonal placement reward and trophy reset notice.
+	SeasonRollover = { Kind = "Event", Burst = 1, PerMinute = 1 },
+
 	-- Cosmetics: Gem purchases, equipping and the Battle Token shop.
 	BuyCosmetic = { Kind = "Function", Burst = 4, PerMinute = 30 },
 	EquipAvatarCosmetic = { Kind = "Function", Burst = 6, PerMinute = 60 },
