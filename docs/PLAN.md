@@ -228,3 +228,29 @@ exact damage formula match, minimum 1 damage, manual cast gating and
 queueing, cast rejection for unknown units/abilities, 1,000 random
 battles with zero errors and median duration inside 90 to 180 seconds,
 and timeout resolution by HP fraction.
+
+---
+
+## Module 3.2: Matchmaking + arenas
+
+**Scope:** trophy-bracket queues with the Power-gap cap, instanced arena
+platforms, real-time match hosting, manual ability casts, battle HUD.
+
+**Server/client split:** `BattleService` owns Ranked and Casual queues,
+pairs players via pure `MatchmakingLogic` (same bracket, Power ratio at
+most 1.35, longest wait first), builds teams from follower rosters via
+pure `TeamLogic`, hosts matches on a Heartbeat stepper, relays event
+batches every 0.25s, teleports players to grid-instanced platforms 500
+studs up and forfeits leavers. MatchEnded signal hands results to the
+rewards engine (3.3). Client `BattleController` renders queue buttons,
+HP bars, per-unit ability buttons (CastAbility) and the end screen.
+
+**Remotes:** JoinQueue/LeaveQueue (3/20pm), CastAbility (10/120pm),
+BattleStart/BattleEvents/BattleEnd (server to client).
+
+**Tests:** bracket mapping and contiguity, Power-gap blocking (the
+anti-stomp guarantee), self-match prevention, greedy pairing with wait
+priority, leftovers, and TeamLogic team building and refusals.
+
+**Smoke note:** two-client end-to-end ranked battle needs Studio
+multi-client testing; logged for the GATE 1 report.

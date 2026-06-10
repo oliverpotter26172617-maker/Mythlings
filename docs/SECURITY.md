@@ -90,3 +90,16 @@ Standing rules enforced across all modules:
 - Cooldowns are unix timestamps checked server-side; SkipBreedCooldown
   recomputes the price from time remaining and refuses on zero remaining,
   so free skips and price spoofing are impossible.
+
+## Module 3.2: Arena
+
+- JoinQueue mode is whitelisted via Guard.oneOf; team and Power are
+  computed server-side from the profile. Trophies come from the profile,
+  never the client.
+- CastAbility: the unit must belong to the caller in their live match
+  (UnitOwners map); the sim then validates ability ownership, readiness
+  and that the unit is alive. Spamming is rate limited at 10 burst.
+- Battle event payloads carry only public state (ids, HP, damage); hidden
+  Potential and exact stats never replicate.
+- Disconnecting mid-match forfeits; the opponent wins and the match
+  record notes the forfeiter, so quit-dodging cannot dodge trophy loss.

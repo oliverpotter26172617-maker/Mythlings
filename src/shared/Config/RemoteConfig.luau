@@ -48,6 +48,18 @@ local remotes: { [string]: RemoteDef } = {
 
 	-- Pays Gems to clear a Mythling's breeding cooldown.
 	SkipBreedCooldown = { Kind = "Function", Burst = 3, PerMinute = 20 },
+
+	-- Joins or leaves the arena queue.
+	JoinQueue = { Kind = "Function", Burst = 3, PerMinute = 20 },
+	LeaveQueue = { Kind = "Function", Burst = 3, PerMinute = 20 },
+
+	-- Casts an ability for one of the caller's units in their live match.
+	CastAbility = { Kind = "Function", Burst = 10, PerMinute = 120 },
+
+	-- Server -> client battle lifecycle pushes.
+	BattleStart = { Kind = "Event", Burst = 1, PerMinute = 1 },
+	BattleEvents = { Kind = "Event", Burst = 1, PerMinute = 1 },
+	BattleEnd = { Kind = "Event", Burst = 1, PerMinute = 1 },
 }
 
 return TableUtil.deepFreeze({
