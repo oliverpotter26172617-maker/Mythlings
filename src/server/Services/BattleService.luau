@@ -17,6 +17,7 @@ local Guard = require(ReplicatedStorage.Shared.Logic.Guard)
 local BattleSim = require(ReplicatedStorage.Shared.Logic.BattleSim)
 local MatchmakingLogic = require(ReplicatedStorage.Shared.Logic.MatchmakingLogic)
 local TeamLogic = require(ReplicatedStorage.Shared.Logic.TeamLogic)
+local Analytics = require(script.Parent.Parent.Lib.Analytics)
 local Net = require(script.Parent.Parent.Lib.Net)
 
 local BattleService = {}
@@ -136,6 +137,8 @@ local function endMatch(match: Match, winnerTeam: number, forfeitedBy: Player?)
 	for teamIndex, player in match.Players do
 		matchesByPlayer[player] = nil
 		if player.Parent ~= nil then
+			-- Match-length telemetry for pacing dashboards.
+			Analytics.custom(player, `BattleDuration_{match.Mode}`, math.floor(duration))
 			Net.FireClient("BattleEnd", player, {
 				MatchId = match.Id,
 				Winner = winnerTeam,

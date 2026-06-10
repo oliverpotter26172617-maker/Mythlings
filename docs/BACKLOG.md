@@ -23,7 +23,7 @@
 | 5.3 | Cosmetics | DONE |
 | 6.1 | Quests + calendar + gifting + group bonus | DONE |
 | 6.2 | Onboarding | DONE |
-| 6.3 | Analytics + telemetry | TODO |
+| 6.3 | Analytics + telemetry | DONE |
 | 6.4 | Anti-exploit hardening | TODO |
 | 6.5 | Performance pass | TODO |
 | 6.6 | Launch checklist | TODO |

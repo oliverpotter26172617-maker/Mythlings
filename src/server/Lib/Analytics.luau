@@ -38,6 +38,20 @@ function Analytics.economy(
 	end)
 end
 
+-- Maps an internal mutation reason to a dashboard transaction type.
+function Analytics.transactionTypeFor(reason: string): string
+	if string.find(reason, "DevProduct", 1, true) == 1 then
+		return "IAP"
+	end
+	local shopPrefixes = { "Buy", "Furniture", "Cosmetic", "Nursery", "Plot", "InstantHatch", "Skip", "ArenaShop" }
+	for _, prefix in shopPrefixes do
+		if string.find(reason, prefix, 1, true) == 1 then
+			return "Shop"
+		end
+	end
+	return "Gameplay"
+end
+
 function Analytics.custom(player: Player, eventName: string, value: number?)
 	pcall(function()
 		(AnalyticsService :: any):LogCustomEvent(player, eventName, value)

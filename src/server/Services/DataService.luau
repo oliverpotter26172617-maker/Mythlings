@@ -18,6 +18,7 @@ local ProfileStore = require(ReplicatedStorage.Packages.ProfileStore)
 local GoodSignal = require(ReplicatedStorage.Packages.GoodSignal)
 local ProfileSchema = require(ReplicatedStorage.Shared.Logic.ProfileSchema)
 local ProfileSanitiser = require(ReplicatedStorage.Shared.Logic.ProfileSanitiser)
+local Analytics = require(script.Parent.Parent.Lib.Analytics)
 local Net = require(script.Parent.Parent.Lib.Net)
 
 local STORE_NAME = "PlayerData"
@@ -143,6 +144,18 @@ function DataService:MutateCurrency(player: Player, currency: string, delta: num
 		return false
 	end
 	data.Currencies[currency] = newBalance
+
+	-- Telemetry: every source and sink for every currency lands on the
+	-- economy dashboard, keyed by the audit reason.
+	Analytics.economy(
+		player,
+		if delta > 0 then "Source" else "Sink",
+		currency,
+		delta,
+		newBalance,
+		Analytics.transactionTypeFor(reason),
+		reason
+	)
 	return true
 end
 

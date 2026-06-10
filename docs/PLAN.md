@@ -478,3 +478,17 @@ ends.
 **Tests:** flow start semantics, ordered walk to completion, immunity
 to out-of-order and unknown metrics, completed/unstarted no-ops, and
 config sanity (every actionable step has a completion metric).
+
+---
+
+## Module 6.3: Analytics + telemetry
+
+**Scope:** economy dashboard coverage and gameplay telemetry.
+
+**Design:** DataService:MutateCurrency is the single gateway for every
+currency change, so one Analytics.economy call there covers every Gem
+and Coin source and sink in the game, keyed by the mandatory audit
+reason and bucketed into IAP/Shop/Gameplay transaction types.
+Onboarding funnel steps were wired in 6.2; battle duration telemetry
+logs per match for pacing dashboards. All analytics calls are
+pcall-guarded and can never break gameplay.
