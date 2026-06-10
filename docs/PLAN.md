@@ -202,3 +202,29 @@ and same-rarity upgrade rate within 0.5 percentage points and keeps
 Potential inside the average plus or minus 15 band with the correct mean;
 mixed-parent rarity splits 50/50 with no upgrades; Mythic cap; species
 element fallback; full validateBreed and skipCost coverage.
+
+---
+
+## Module 3.1: Battle core
+
+**Scope:** pure-Luau 3v3 simulation with cooldown abilities, the locked
+damage formula, element wheel and manual/auto cast policies.
+
+**Design:** `BattleSim` is a step-able simulation (0.1s ticks) with rng
+injected. Auto units cast their strongest ready ability; manual (player)
+units auto-fire only the basic Strike and cast abilities when queued via
+queueCast, giving the auto-battler feel with manual triggers. Targeting
+focuses the weakest enemy. After 150s an enrage ramp (+3% damage per
+second) prevents stalemates; at the 240s cap the higher HP fraction wins.
+Wheel: Flame>Terra>Storm>Tide>Flame, Shadow<->Radiant. Abilities are pure
+data in AbilityConfig (Strike plus per-element Bolt/Nova/Frenzy unlocked
+by stage).
+
+**Tuning:** HpMultiplier 110 lands the duration distribution at p10 69s,
+median 125s, p90 198s with 1.3% timeouts over random matchups.
+
+**Tests:** element wheel coverage (every element exactly one advantage),
+exact damage formula match, minimum 1 damage, manual cast gating and
+queueing, cast rejection for unknown units/abilities, 1,000 random
+battles with zero errors and median duration inside 90 to 180 seconds,
+and timeout resolution by HP fraction.

@@ -16,3 +16,11 @@ defaults shipped (all in `BreedingConfig`):
 - Parent element share = 80% of the element roll, split between parents.
 - Bred egg incubation = 180 minutes.
 - Cooldown Gem skip = 8 Gems per hour remaining (floor 1).
+
+## 3.1 Element wheel layout
+
+The spec asks for a rock-paper-scissors advantage wheel over six elements
+without naming the pairs. Shipped (in `BattleConfig.Wheel`):
+Flame beats Terra, Terra beats Storm, Storm beats Tide, Tide beats Flame,
+and Shadow and Radiant beat each other. Every element has exactly one
+advantage (enforced by a unit test).

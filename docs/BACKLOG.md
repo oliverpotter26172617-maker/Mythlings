@@ -10,7 +10,7 @@
 | 1.3 | Mythling instancing | DONE |
 | 2.1 | Feeding/XP/stages | DONE |
 | 2.2 | Breeding | DONE |
-| 3.1 | Battle core | TODO |
+| 3.1 | Battle core | DONE |
 | 3.2 | Matchmaking + arenas | TODO |
 | 3.3 | Rewards engine | TODO |
 | 3.4 | Boss raids | TODO |
