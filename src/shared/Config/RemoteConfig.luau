@@ -33,6 +33,15 @@ local remotes: { [string]: RemoteDef } = {
 
 	-- Sets which owned Mythlings follow the player (array of ids).
 	SetActiveMythlings = { Kind = "Function", Burst = 4, PerMinute = 30 },
+
+	-- Buys food items for Coins or Gems.
+	BuyFood = { Kind = "Function", Burst = 5, PerMinute = 40 },
+
+	-- Feeds one owned food item to one owned Mythling.
+	FeedMythling = { Kind = "Function", Burst = 6, PerMinute = 60 },
+
+	-- Server -> client: a Mythling reached a new growth stage (for VFX).
+	StageUpEffect = { Kind = "Event", Burst = 1, PerMinute = 1 },
 }
 
 return TableUtil.deepFreeze({

@@ -156,3 +156,26 @@ formation offsets.
 **Smoke note:** the 50-concurrent-actor 60fps benchmark needs Roblox
 Studio; the design keeps per-actor cost to one ball part, two align
 constraints and one billboard. Benchmark logged for the GATE 1 report.
+
+---
+
+## Module 2.1: Feeding, XP and stages
+
+**Scope:** food shop, XP curves, stage transitions with VFX moments.
+
+**Server/client split:** `GrowthService` sells food (BuyFood), consumes it
+(FeedMythling) and owns `GrantXp`, the single XP entry point that the
+battle rewards engine will reuse. Stage-ups respawn follower actors at the
+new scale and push a StageUpEffect event; `GrowthController` plays the
+particle burst and toast. Pure logic: `StatCalc` (stat formula and Power
+score) and `GrowthLogic` (thresholds, multi-stage grants, purchase
+validation). Config: `GrowthConfig` (food catalogue, stage thresholds).
+
+**Remotes:** BuyFood (5/40pm), FeedMythling (6/60pm), StageUpEffect
+(server to client).
+
+**Tests:** StatCalc spec proves computed stats equal the config formula
+for every stage, ratio checks between stages, Potential band scaling and
+clamping. GrowthLogic spec covers thresholds, single and multi stage-up
+ordering, no regression, negative XP rejection and food purchase
+validation.

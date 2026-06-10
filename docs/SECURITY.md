@@ -70,3 +70,12 @@ Standing rules enforced across all modules:
 - Actors get network ownership for follow physics only. They carry no
   authority over game state; position is cosmetic outside arenas (arena
   positions are server-checked in 6.4).
+
+## Module 2.1: Growth
+
+- BuyFood quantity is Guard-clamped to 1..MaxFoodPerPurchase as an integer;
+  cost is config price times quantity computed server-side.
+- FeedMythling requires owning both the Mythling and at least one of the
+  food item; inventory decrements before XP grant, no yields between.
+- XP only enters records via GrowthService:GrantXp, so stage state cannot
+  desync from XP.
