@@ -179,3 +179,26 @@ for every stage, ratio checks between stages, Potential band scaling and
 clamping. GrowthLogic spec covers thresholds, single and multi stage-up
 ordering, no regression, negative XP rejection and food purchase
 validation.
+
+---
+
+## Module 2.2: Breeding
+
+**Scope:** pair selection UI, inheritance rolls, cooldowns with Gem skip,
+2% Shiny mutation, bred eggs with sealed contents.
+
+**Server/client split:** `BreedingService` validates pairs (ownership,
+distinctness, Adult+, rested, egg storage), rolls the offspring at breed
+time and seals it in the egg record's Outcome field, which
+ProfileSanitiser strips from every client sync, so the reveal stays a
+surprise and Potential stays hidden. Parents get the 6 hour cooldown;
+SkipBreedCooldown charges Gems per hour remaining. HatchService now
+honours bred eggs (own incubation length, no pity interaction).
+
+**Remotes:** BreedMythlings, SkipBreedCooldown (burst 3, 20/min each).
+
+**Tests:** 100,000-roll simulation holds element weighting, Shiny rate
+and same-rarity upgrade rate within 0.5 percentage points and keeps
+Potential inside the average plus or minus 15 band with the correct mean;
+mixed-parent rarity splits 50/50 with no upgrades; Mythic cap; species
+element fallback; full validateBreed and skipCost coverage.

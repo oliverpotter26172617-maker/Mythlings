@@ -8,6 +8,9 @@ return function()
 			Mythlings = {
 				M1 = { SpeciesId = "Cindercub", Potential = 87, Rarity = "Common" },
 			},
+			Eggs = {
+				E1 = { Tier = "Bred", Outcome = { SpeciesId = "Voidmaw", Potential = 92, Shiny = true } },
+			},
 			MigrationBackups = { v2 = { Old = true } },
 			PurchaseLedger = { ["receipt-1"] = 123 },
 		}
@@ -21,6 +24,12 @@ return function()
 		it("redacts hidden Potential from every Mythling", function()
 			expect(snapshot.Mythlings.M1.Potential).to.equal(nil)
 			expect(snapshot.Mythlings.M1.SpeciesId).to.equal("Cindercub")
+		end)
+
+		it("redacts pre-rolled outcomes from bred eggs", function()
+			expect(snapshot.Eggs.E1.Outcome).to.equal(nil)
+			expect(snapshot.Eggs.E1.Tier).to.equal("Bred")
+			expect(data.Eggs.E1.Outcome.SpeciesId).to.equal("Voidmaw")
 		end)
 
 		it("does not mutate the source profile", function()

@@ -10,8 +10,8 @@ return function()
 	local function makeRng(seed)
 		local state = seed
 		return function()
-			state = (state * 1103515245 + 12345) % 2147483648
-			return state / 2147483648
+			state = (state * 25214903917 + 11) % 281474976710656
+			return state / 281474976710656
 		end
 	end
 

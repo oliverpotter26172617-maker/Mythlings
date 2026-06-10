@@ -79,3 +79,14 @@ Standing rules enforced across all modules:
   food item; inventory decrements before XP grant, no yields between.
 - XP only enters records via GrowthService:GrantXp, so stage state cannot
   desync from XP.
+
+## Module 2.2: Breeding
+
+- BreedMythlings takes two ids resolved inside the caller's own profile;
+  no path exists to reference another player's Mythlings.
+- The offspring is rolled server-side at breed time and stored in
+  egg.Outcome, which ProfileSanitiser removes from ProfileSync payloads
+  (unit tested), so clients cannot scout or reroll the result.
+- Cooldowns are unix timestamps checked server-side; SkipBreedCooldown
+  recomputes the price from time remaining and refuses on zero remaining,
+  so free skips and price spoofing are impossible.

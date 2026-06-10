@@ -28,6 +28,14 @@ function ProfileSanitiser.sanitise(data: { [string]: any }): { [string]: any }
 		end
 	end
 
+	-- Bred eggs carry their pre-rolled contents; the surprise (and the
+	-- hidden Potential inside) must never replicate.
+	if snapshot.Eggs then
+		for _, egg in snapshot.Eggs do
+			egg.Outcome = nil
+		end
+	end
+
 	return snapshot
 end
 

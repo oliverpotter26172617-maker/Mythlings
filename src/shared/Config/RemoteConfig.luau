@@ -42,6 +42,12 @@ local remotes: { [string]: RemoteDef } = {
 
 	-- Server -> client: a Mythling reached a new growth stage (for VFX).
 	StageUpEffect = { Kind = "Event", Burst = 1, PerMinute = 1 },
+
+	-- Breeds two owned Adult+ Mythlings into an egg.
+	BreedMythlings = { Kind = "Function", Burst = 3, PerMinute = 20 },
+
+	-- Pays Gems to clear a Mythling's breeding cooldown.
+	SkipBreedCooldown = { Kind = "Function", Burst = 3, PerMinute = 20 },
 }
 
 return TableUtil.deepFreeze({

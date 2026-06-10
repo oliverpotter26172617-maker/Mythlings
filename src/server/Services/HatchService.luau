@@ -73,15 +73,43 @@ local function mythlingCount(data: { [string]: any }): number
 end
 
 -- Rolls the hatch, writes the Mythling, removes the egg and updates pity.
--- Callers must have verified the egg is finished.
+-- Callers must have verified the egg is finished. Bred eggs carry a
+-- pre-rolled Outcome and do not touch shop pity counters.
 local function resolveHatch(player: Player, data: { [string]: any }, eggId: string): { [string]: any }
 	local egg = data.Eggs[eggId]
-	local tier = EggConfig.Tiers[egg.Tier]
 
 	if mythlingCount(data) >= mythlingStorageLimit(data) then
 		Net.Refuse("Your Mythling storage is full.")
 	end
 
+	if egg.Outcome ~= nil then
+		local outcome = egg.Outcome
+		data.Eggs[eggId] = nil
+		data.Stats.TotalHatches += 1
+
+		local mythlingId = `M{data.NextMythlingId}`
+		data.NextMythlingId += 1
+		data.Mythlings[mythlingId] = MythlingFactory.create({
+			SpeciesId = outcome.SpeciesId,
+			Potential = outcome.Potential,
+			Shiny = outcome.Shiny,
+			Now = os.time(),
+		})
+
+		DataService:Sync(player)
+		local species = MythlingConfig.Species[outcome.SpeciesId]
+		return {
+			MythlingId = mythlingId,
+			SpeciesId = outcome.SpeciesId,
+			DisplayName = species.DisplayName,
+			Rarity = species.Rarity,
+			Element = species.Element,
+			Shiny = outcome.Shiny == true,
+			PityTriggered = false,
+		}
+	end
+
+	local tier = EggConfig.Tiers[egg.Tier]
 	local pity = data.PityCounters[egg.Tier] or 0
 	local result = HatchLogic.hatch({
 		Odds = tier.Odds,
@@ -117,8 +145,21 @@ local function resolveHatch(player: Player, data: { [string]: any }, eggId: stri
 		DisplayName = MythlingConfig.Species[result.SpeciesId].DisplayName,
 		Rarity = result.Rarity,
 		Element = MythlingConfig.Species[result.SpeciesId].Element,
+		Shiny = false,
 		PityTriggered = result.PityTriggered,
 	}
+end
+
+-- Bred eggs store their own incubation length; shop eggs use config.
+local function hatchMinutesFor(egg: { [string]: any }): number
+	if egg.HatchMinutes ~= nil then
+		return egg.HatchMinutes
+	end
+	local tier = EggConfig.Tiers[egg.Tier]
+	if tier == nil then
+		Net.Refuse("That egg cannot be incubated.")
+	end
+	return tier.HatchMinutes
 end
 
 function HatchService:OnInit()
@@ -133,8 +174,7 @@ function HatchService:OnInit()
 		if incubatingCount(data) >= incubationSlots(data) then
 			Net.Refuse("All your incubation slots are busy.")
 		end
-		local tier = EggConfig.Tiers[egg.Tier]
-		egg.HatchesAt = os.time() + tier.HatchMinutes * 60
+		egg.HatchesAt = os.time() + hatchMinutesFor(egg) * 60
 		DataService:Sync(player)
 		return { EggId = eggId, HatchesAt = egg.HatchesAt }
 	end)
