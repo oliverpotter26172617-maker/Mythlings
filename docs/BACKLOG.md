@@ -20,7 +20,7 @@
 | 4.3 | Battle Pass | DONE |
 | 5.1 | Plots | DONE |
 | 5.2 | Idle income + visiting | DONE |
-| 5.3 | Cosmetics | TODO |
+| 5.3 | Cosmetics | DONE |
 | 6.1 | Quests + calendar + gifting + group bonus | TODO |
 | 6.2 | Onboarding | TODO |
 | 6.3 | Analytics + telemetry | TODO |

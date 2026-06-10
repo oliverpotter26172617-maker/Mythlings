@@ -408,3 +408,28 @@ income payout. Feeding now stamps LastFedAt.
 **Tests:** exact config-rate accrual, fed doubling, the 12 hour cap,
 unowned Mythlings paying nothing, double-claim paying zero, first-claim
 clock start, per-friend-per-day visits with the daily cap and reset.
+
+---
+
+## Module 5.3: Cosmetics + Arena Shop
+
+**Scope:** avatar and Mythling cosmetic layers, equip system, the
+rotating Battle Token Arena Shop.
+
+**Design:** stat neutrality is structural: CosmeticDef has no stat
+fields and a build-failing test rejects any key outside the whitelist
+(DisplayName, Layer, Slot, PriceGems, Colour). Battle code never reads
+cosmetics; a test proves teams and full same-seed battles are identical
+dressed or not. Equipping validates layer/slot/ownership via pure
+CosmeticsLogic. Earned-only cosmetics (raid, pass, arena shop) carry no
+Gem price and refuse direct purchase. The Arena Shop rotates three
+weekly slots over a pool of cosmetics, rare food and eggs, all spending
+Battle Tokens. Auras, dyes (Shiny only) and hats render on follower
+actors as light/colour/part accents.
+
+**Remotes:** BuyCosmetic, EquipAvatarCosmetic, EquipMythlingCosmetic,
+BuyArenaShopItem.
+
+**Tests:** whitelist build gate, team/battle identity with cosmetics,
+buy and equip validation across layers and slots, shop rotation and
+pool reference integrity.

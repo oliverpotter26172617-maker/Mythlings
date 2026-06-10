@@ -5,6 +5,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CosmeticConfig = require(ReplicatedStorage.Shared.Config.CosmeticConfig)
 local PlayerConfig = require(ReplicatedStorage.Shared.Config.PlayerConfig)
 local RaidConfig = require(ReplicatedStorage.Shared.Config.RaidConfig)
 
@@ -33,7 +34,12 @@ function Grants.grant(
 		data.Inventory.Food[item.Id] = (data.Inventory.Food[item.Id] or 0) + item.Count
 		return item
 	elseif item.Type == "Cosmetic" then
-		data.Cosmetics.OwnedMythling[item.Id] = true
+		local def = CosmeticConfig.Catalogue[item.Id]
+		if def ~= nil and def.Layer == "Avatar" then
+			data.Cosmetics.OwnedAvatar[item.Id] = true
+		else
+			data.Cosmetics.OwnedMythling[item.Id] = true
+		end
 		return item
 	elseif item.Type == "Egg" then
 		local eggCount = 0

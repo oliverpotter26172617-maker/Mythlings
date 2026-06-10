@@ -157,3 +157,11 @@ Standing rules enforced across all modules:
 - Visit bonuses require the target to be a Roblox friend present in the
   server; the once-per-pair-per-day ledger lives in the visitor profile
   so bonus farming with alt hopping is capped at 5 per day.
+
+## Module 5.3: Cosmetics
+
+- Equip requests validate layer, slot and ownership server-side; battle
+  code never reads cosmetic state, so no cosmetic can influence combat
+  (enforced by a same-seed battle identity test).
+- Arena Shop purchases resolve the entry from the server-derived weekly
+  rotation; only a slot index crosses the wire.

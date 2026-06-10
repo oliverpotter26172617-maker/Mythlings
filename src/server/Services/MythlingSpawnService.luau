@@ -7,6 +7,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CosmeticConfig = require(ReplicatedStorage.Shared.Config.CosmeticConfig)
 local ElementConfig = require(ReplicatedStorage.Shared.Config.ElementConfig)
 local MythlingConfig = require(ReplicatedStorage.Shared.Config.MythlingConfig)
 local PlayerConfig = require(ReplicatedStorage.Shared.Config.PlayerConfig)
@@ -62,6 +63,37 @@ local function buildActor(player: Player, mythlingId: string, record: { [string]
 	alignOrientation.MaxTorque = 100000
 	alignOrientation.Responsiveness = PlayerConfig.FollowResponsiveness
 	alignOrientation.Parent = body
+
+	-- Cosmetic visuals: purely decorative, never read by battle code.
+	local cosmetics = record.Cosmetics or {}
+	local dye = cosmetics.Dye and CosmeticConfig.Catalogue[cosmetics.Dye]
+	if dye and dye.Colour and record.Shiny then
+		body.Color = Color3.fromRGB(dye.Colour.R, dye.Colour.G, dye.Colour.B)
+	end
+	local aura = cosmetics.Aura and CosmeticConfig.Catalogue[cosmetics.Aura]
+	if aura and aura.Colour then
+		local light = Instance.new("PointLight")
+		light.Name = "AuraLight"
+		light.Color = Color3.fromRGB(aura.Colour.R, aura.Colour.G, aura.Colour.B)
+		light.Range = 10
+		light.Brightness = 2
+		light.Parent = body
+	end
+	if cosmetics.Hat and CosmeticConfig.Catalogue[cosmetics.Hat] then
+		local hat = Instance.new("Part")
+		hat.Name = "Hat"
+		hat.Shape = Enum.PartType.Cylinder
+		hat.Size = Vector3.new(0.4, 1.2, 1.2) * scale
+		hat.Color = Color3.fromRGB(40, 40, 48)
+		hat.CanCollide = false
+		hat.Massless = true
+		hat.CFrame = body.CFrame * CFrame.new(0, 1.1 * scale, 0) * CFrame.Angles(0, 0, math.rad(90))
+		hat.Parent = model
+		local weld = Instance.new("WeldConstraint")
+		weld.Part0 = body
+		weld.Part1 = hat
+		weld.Parent = hat
+	end
 
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "NameTag"

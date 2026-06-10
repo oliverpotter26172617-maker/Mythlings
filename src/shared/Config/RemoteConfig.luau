@@ -86,6 +86,12 @@ local remotes: { [string]: RemoteDef } = {
 	RemoveFurniture = { Kind = "Function", Burst = 8, PerMinute = 80 },
 	ClaimPlotIncome = { Kind = "Function", Burst = 3, PerMinute = 20 },
 	VisitFriendPlot = { Kind = "Function", Burst = 3, PerMinute = 20 },
+
+	-- Cosmetics: Gem purchases, equipping and the Battle Token shop.
+	BuyCosmetic = { Kind = "Function", Burst = 4, PerMinute = 30 },
+	EquipAvatarCosmetic = { Kind = "Function", Burst = 6, PerMinute = 60 },
+	EquipMythlingCosmetic = { Kind = "Function", Burst = 6, PerMinute = 60 },
+	BuyArenaShopItem = { Kind = "Function", Burst = 3, PerMinute = 20 },
 }
 
 return TableUtil.deepFreeze({
