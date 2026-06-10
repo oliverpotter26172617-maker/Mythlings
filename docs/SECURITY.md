@@ -138,3 +138,14 @@ Standing rules enforced across all modules:
   validated against server-side XP and ownership. Double claims are
   rejected from profile state.
 - Premium ownership is set exclusively by the receipt processor.
+
+## Module 5.1: Housing
+
+- PlaceFurniture takes Guard-clamped integers and whitelisted rotations;
+  HousingLogic then enforces bounds, grid, overlap and tier caps. The
+  out-of-bounds exploit is covered by a unit test.
+- All furniture state lives in the owner's profile; guids are resolved
+  in the caller's own Housing table, so editing someone else's plot is
+  structurally impossible.
+- Theme equipping checks ownership server-side; the VIP exclusive theme
+  is only equippable while the VIP pass is cached true.

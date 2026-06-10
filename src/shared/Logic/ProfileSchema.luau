@@ -45,10 +45,13 @@ function ProfileSchema.buildTemplate(): { [string]: any }
 		Housing = {
 			PlotTier = 1,
 			Theme = "Starter",
+			OwnedThemes = { Starter = true },
 			Furniture = {}, -- [furnitureGuid]: { ItemId, X, Z, Rotation }
+			NextFurnitureId = 1,
 			LastIncomeClaimAt = 0,
-			VisitBonusDay = "",
+			VisitBonusDay = 0,
 			VisitBonusCount = 0,
+			VisitedToday = {},
 		},
 
 		Cosmetics = {

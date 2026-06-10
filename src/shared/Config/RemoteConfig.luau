@@ -76,6 +76,16 @@ local remotes: { [string]: RemoteDef } = {
 
 	-- Claims a reached Battle Pass tier on the Free or Premium track.
 	ClaimBattlePassTier = { Kind = "Function", Burst = 6, PerMinute = 60 },
+
+	-- Housing: upgrades, themes, furniture and visiting.
+	BuyPlotUpgrade = { Kind = "Function", Burst = 3, PerMinute = 20 },
+	BuyPlotTheme = { Kind = "Function", Burst = 3, PerMinute = 20 },
+	SetPlotTheme = { Kind = "Function", Burst = 3, PerMinute = 20 },
+	BuyFurniture = { Kind = "Function", Burst = 5, PerMinute = 40 },
+	PlaceFurniture = { Kind = "Function", Burst = 8, PerMinute = 80 },
+	RemoveFurniture = { Kind = "Function", Burst = 8, PerMinute = 80 },
+	ClaimPlotIncome = { Kind = "Function", Burst = 3, PerMinute = 20 },
+	VisitFriendPlot = { Kind = "Function", Burst = 3, PerMinute = 20 },
 }
 
 return TableUtil.deepFreeze({

@@ -364,3 +364,25 @@ profile, so they persist across sessions by construction.
 mapping with the final-tier cap, XP accumulation, claim-once, unreached
 and premium gating, independent track claims, nonsense tier rejection,
 and both reward tracks fully populated for all 50 tiers.
+
+---
+
+## Module 5.1: Plots
+
+**Scope:** plot allocation, four size tiers, themes (Cloud Isle is VIP
+only), grid-snap furniture with bounds, ownership, rotation and collision
+validation, full persistence.
+
+**Server/client split:** `HousingService` allocates neighbourhood slots,
+renders plot floors and furniture from the profile, and owns all seven
+housing remotes. Placement is validated by pure `HousingLogic.canPlace`
+(grid integers, quarter-turn rotations, footprint fully inside the tier
+bounds, no overlap, per-tier furniture cap). Client UI scans for the
+first legal spot for convenience but the server re-validates everything.
+Removing furniture returns it to inventory.
+
+**Tests:** the out-of-plot exploit placement is rejected at every edge
+including extreme coordinates, the same spot legalises after an upgrade,
+off-grid and bad rotations refuse, overlap versus adjacency, rotated
+footprint swapping, tier caps, upgrade fund/top-tier validation and
+theme purchase rules (VIP exclusivity included).
