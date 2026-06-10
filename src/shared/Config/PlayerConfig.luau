@@ -26,6 +26,14 @@ return TableUtil.deepFreeze({
 	-- Battle team size for arena matches.
 	TeamSize = 3,
 
+	-- Mythlings that may follow the player around the world at once.
+	MaxFollowers = 3,
+
+	-- Follower formation tunables (studs).
+	FollowDistance = 5,
+	FollowSpacing = 3.5,
+	FollowResponsiveness = 18,
+
 	-- Default client settings for a new profile.
 	DefaultSettings = {
 		Music = true,

@@ -30,6 +30,9 @@ local remotes: { [string]: RemoteDef } = {
 
 	-- Pays Gems to finish an incubating egg now, then claims it.
 	InstantFinishHatch = { Kind = "Function", Burst = 3, PerMinute = 20 },
+
+	-- Sets which owned Mythlings follow the player (array of ids).
+	SetActiveMythlings = { Kind = "Function", Burst = 4, PerMinute = 30 },
 }
 
 return TableUtil.deepFreeze({

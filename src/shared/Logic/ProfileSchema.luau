@@ -34,6 +34,9 @@ function ProfileSchema.buildTemplate(): { [string]: any }
 		Eggs = {},
 		NextEggId = 1,
 
+		-- Ordered list of Mythling ids currently following the player.
+		ActiveMythlings = {},
+
 		Inventory = {
 			Food = {}, -- [foodId]: count
 			Items = {}, -- [itemId]: count

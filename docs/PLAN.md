@@ -132,3 +132,27 @@ guarantee fires exactly at the threshold, distribution test holds odds
 within 1 point over 100,000 rolls, element bias steers 50% of species
 rolls, instant finish pricing matches ceil(minutes x 0.4) with a 1 Gem
 floor, and MythlingFactory builds correct Hatchling records.
+
+---
+
+## Module 1.3: Mythling instancing
+
+**Scope:** follower actors for owned Mythlings, stage-based scaling,
+roster selection with ownership validation.
+
+**Server/client split:** `MythlingSpawnService` spawns lightweight
+part-based actors (placeholder art), scales them by StageScales, colours
+by element/rarity, marks Shiny with neon, then hands network ownership to
+the owner. `MythlingFollowController` (client) drives AlignPosition goals
+each Heartbeat using shared formation maths, so the server spends nothing
+on follow physics and replication is native. Roster changes go through
+SetActiveMythlings with pure validation (`ActiveMythlingLogic`).
+
+**Remotes:** SetActiveMythlings (Function, burst 4, 30/min).
+
+**Tests:** roster validation (ownership, duplicates, cap, empty) and
+formation offsets.
+
+**Smoke note:** the 50-concurrent-actor 60fps benchmark needs Roblox
+Studio; the design keeps per-actor cost to one ball part, two align
+constraints and one billboard. Benchmark logged for the GATE 1 report.

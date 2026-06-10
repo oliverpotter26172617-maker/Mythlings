@@ -60,3 +60,13 @@ Standing rules enforced across all modules:
 - Incubation slots and storage limits are enforced from config plus the
   server-side pass cache, never from client state.
 - Pity counters live in the profile and are only mutated by resolveHatch.
+
+## Module 1.3: Followers
+
+- `SetActiveMythlings(ids)`: array capped at MaxFollowers by both the
+  Guard schema and roster validation; ids must exist in the caller's own
+  collection; duplicates rejected. Other players' ids cannot appear since
+  lookups are within the caller's profile.
+- Actors get network ownership for follow physics only. They carry no
+  authority over game state; position is cosmetic outside arenas (arena
+  positions are server-checked in 6.4).

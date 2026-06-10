@@ -7,7 +7,7 @@
 | 0.3 | Remote framework | DONE |
 | 1.1 | EggConfig + odds UI | DONE |
 | 1.2 | Hatch system | DONE |
-| 1.3 | Mythling instancing | TODO |
+| 1.3 | Mythling instancing | DONE |
 | 2.1 | Feeding/XP/stages | TODO |
 | 2.2 | Breeding | TODO |
 | 3.1 | Battle core | TODO |
