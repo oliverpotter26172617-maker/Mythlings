@@ -24,6 +24,84 @@ local actorsFolder: Folder
 
 local activeActors: { [Player]: { Model } } = {}
 
+-- Welds a cheap decorative part onto the body. All features share the
+-- same render flags as the body and never collide.
+local function weldFeature(body: BasePart, props: { [string]: any }, offset: CFrame): Part
+	local feature = Instance.new("Part")
+	feature.Anchored = false
+	feature.CanCollide = false
+	feature.CanTouch = false
+	feature.CanQuery = false
+	feature.CastShadow = false
+	feature.Massless = true
+	for key, value in props do
+		(feature :: any)[key] = value
+	end
+	feature.CFrame = body.CFrame * offset
+	feature.Parent = body.Parent
+	local weld = Instance.new("WeldConstraint")
+	weld.Part0 = body
+	weld.Part1 = feature
+	weld.Parent = feature
+	return feature
+end
+
+-- Turns the base sphere into a readable critter: two eyes facing forward
+-- plus one accent shaped by element. Placeholder art, five parts max.
+local function addCritterFeatures(body: BasePart, scale: number, element: string)
+	for _, side in { -1, 1 } do
+		local eye = weldFeature(body, {
+			Name = "Eye",
+			Shape = Enum.PartType.Ball,
+			Size = Vector3.new(0.5, 0.5, 0.5) * scale,
+			Color = Color3.fromRGB(250, 250, 250),
+			Material = Enum.Material.SmoothPlastic,
+		}, CFrame.new(side * 0.4 * scale, 0.3 * scale, -0.85 * scale))
+		weldFeature(eye, {
+			Name = "Pupil",
+			Shape = Enum.PartType.Ball,
+			Size = Vector3.new(0.22, 0.22, 0.22) * scale,
+			Color = Color3.fromRGB(20, 20, 24),
+			Material = Enum.Material.SmoothPlastic,
+		}, CFrame.new(0, 0, -0.18 * scale))
+	end
+
+	if element == "Flame" or element == "Storm" then
+		-- Spiky crest.
+		weldFeature(body, {
+			Name = "Crest",
+			Size = Vector3.new(0.3, 0.9, 0.3) * scale,
+			Color = body.Color,
+			Material = Enum.Material.Neon,
+		}, CFrame.new(0, 1.05 * scale, 0) * CFrame.Angles(0, 0, math.rad(8)))
+	elseif element == "Tide" then
+		-- Back fin.
+		weldFeature(body, {
+			Name = "Fin",
+			Size = Vector3.new(0.2, 0.8, 1.1) * scale,
+			Color = body.Color,
+			Material = Enum.Material.SmoothPlastic,
+		}, CFrame.new(0, 0.8 * scale, 0.4 * scale) * CFrame.Angles(math.rad(-20), 0, 0))
+	elseif element == "Terra" then
+		-- Rocky brow.
+		weldFeature(body, {
+			Name = "Brow",
+			Size = Vector3.new(1.4, 0.35, 0.5) * scale,
+			Color = Color3.fromRGB(110, 100, 90),
+			Material = Enum.Material.Slate,
+		}, CFrame.new(0, 0.75 * scale, -0.5 * scale))
+	else
+		-- Shadow and Radiant get a floating halo mote.
+		weldFeature(body, {
+			Name = "Mote",
+			Shape = Enum.PartType.Ball,
+			Size = Vector3.new(0.35, 0.35, 0.35) * scale,
+			Color = body.Color,
+			Material = Enum.Material.Neon,
+		}, CFrame.new(0, 1.4 * scale, 0))
+	end
+end
+
 local function buildActor(player: Player, mythlingId: string, record: { [string]: any }, slotIndex: number): Model
 	local species = MythlingConfig.Species[record.SpeciesId]
 	local scale = StatConfig.StageScales[record.Stage] or 1
@@ -66,6 +144,8 @@ local function buildActor(player: Player, mythlingId: string, record: { [string]
 	alignOrientation.MaxTorque = 100000
 	alignOrientation.Responsiveness = PlayerConfig.FollowResponsiveness
 	alignOrientation.Parent = body
+
+	addCritterFeatures(body, scale, species.Element)
 
 	-- Cosmetic visuals: purely decorative, never read by battle code.
 	local cosmetics = record.Cosmetics or {}

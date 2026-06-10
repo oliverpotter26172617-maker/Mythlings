@@ -226,3 +226,9 @@ Hardening actions taken in this pass:
   or reward amount from the client anywhere in the codebase.
 - Net violation counters remain available via Net.GetViolationCounts()
   and all violations are warn-logged with player attribution.
+
+## Post-gate additions
+
+- UpdateSetting: key is whitelisted via Guard.oneOf and the value must
+  be a boolean; nothing else in the profile is reachable.
+- SeasonRollover and the hub world add no client-writable surface.

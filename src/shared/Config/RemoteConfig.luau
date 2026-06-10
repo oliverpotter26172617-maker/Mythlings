@@ -87,6 +87,9 @@ local remotes: { [string]: RemoteDef } = {
 	ClaimPlotIncome = { Kind = "Function", Burst = 3, PerMinute = 20 },
 	VisitFriendPlot = { Kind = "Function", Burst = 3, PerMinute = 20 },
 
+	-- Persists a client settings toggle (Music, Sfx, LowQuality).
+	UpdateSetting = { Kind = "Function", Burst = 4, PerMinute = 30 },
+
 	-- Quests, calendar and gifting.
 	ClaimQuest = { Kind = "Function", Burst = 6, PerMinute = 60 },
 	GiftEgg = { Kind = "Function", Burst = 3, PerMinute = 20 },

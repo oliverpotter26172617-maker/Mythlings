@@ -559,3 +559,11 @@ a reward. Unit tested (placement, idempotency, bracket coverage).
 GitHub Actions workflow runs selene, StyLua, the full Lune test suite
 and a rojo build on every push and pull request with the pinned
 toolchain versions.
+
+### P5: Critter models, HUD fix, settings
+Follower actors gained eyes and per-element accents (crest, fin, rocky
+brow or halo mote) at five cheap parts max, replacing plain spheres.
+Battle HUD HP bars now read authoritative MaxHp from the start payload.
+Settings (Music, Sfx, LowQuality) persist via a whitelisted
+UpdateSetting remote with a client panel; the SFX toggle gates the
+shared click sound.

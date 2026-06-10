@@ -59,6 +59,8 @@ local function buildUnitRow(parent: Frame, unit: { [string]: any }, order: numbe
 	})
 	UIKit.rounded(4).Parent = bar
 	bar.Parent = barBack
+	-- The start payload carries authoritative MaxHp for exact fractions.
+	bar:SetAttribute("MaxHp", unit.MaxHp)
 
 	unitRows[unit.Id] = { bar = bar, label = label }
 end
