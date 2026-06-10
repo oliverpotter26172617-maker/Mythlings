@@ -4,42 +4,91 @@
 -- TestEZ-compatible API (describe / it / expect) so the same specs can
 -- also be executed by TestEZ inside Roblox Studio.
 --
--- Modules under test use relative string requires ("./Foo", "../Util/Bar")
--- which this runner resolves against the filesystem and which the Roblox
--- engine resolves against the instance tree.
+-- Modules use ordinary Roblox instance requires (require(script.Parent.Foo)).
+-- This runner emulates the instance tree over the filesystem: src/shared
+-- behaves like ReplicatedStorage.Shared, directories behave like Folders and
+-- .luau files behave like ModuleScripts.
 
 local fs = require("@lune/fs")
 local luau = require("@lune/luau")
 local process = require("@lune/process")
 
 local ROOT = "src/shared"
+local ROOT_NAME = "Shared"
 
 -- ---------------------------------------------------------------------------
--- Module loader with relative string require support
+-- Fake instance tree
+-- ---------------------------------------------------------------------------
+
+-- The tree is built eagerly because Lune's fs API can yield, which is not
+-- allowed inside __index metamethods.
+
+local nodeMeta = {
+	__index = function(node, key)
+		local child = node.__children and node.__children[key]
+		if child then
+			return child
+		end
+		error(`{key} is not a valid member of {node.__path}`)
+	end,
+	__tostring = function(node)
+		return node.Name
+	end,
+}
+
+local function makeNode(path: string, name: string, parent: any, isDir: boolean)
+	local node = {
+		__path = path,
+		__isDir = isDir,
+		__children = isDir and {} or nil,
+		Name = name,
+		Parent = parent,
+	}
+	node.GetChildren = function(self)
+		local children = {}
+		for _, child in self.__children or {} do
+			table.insert(children, child)
+		end
+		return children
+	end
+	node.FindFirstChild = function(self, childName)
+		return (self.__children or {})[childName]
+	end
+	node.IsA = function(self, className)
+		if self.__isDir then
+			return className == "Folder" or className == "Instance"
+		end
+		return className == "ModuleScript" or className == "LuaSourceContainer" or className == "Instance"
+	end
+	return setmetatable(node, nodeMeta)
+end
+
+local function buildTree(path: string, name: string, parent: any)
+	local node = makeNode(path, name, parent, true)
+	for _, entry in fs.readDir(path) do
+		local full = `{path}/{entry}`
+		if fs.isDir(full) then
+			node.__children[entry] = buildTree(full, entry, node)
+		elseif string.match(entry, "%.luau?$") then
+			local childName = string.gsub(entry, "%.luau?$", "")
+			node.__children[childName] = makeNode(full, childName, node, false)
+		end
+	end
+	return node
+end
+
+local sharedRoot = buildTree(ROOT, ROOT_NAME, nil)
+
+local function childNode(node, childName: string)
+	return (node.__children or {})[childName]
+end
+
+-- ---------------------------------------------------------------------------
+-- Module loader
 -- ---------------------------------------------------------------------------
 
 local moduleCache = {}
-
-local function normalise(path: string): string
-	local parts = {}
-	for part in string.gmatch(path, "[^/]+") do
-		if part == ".." then
-			table.remove(parts)
-		elseif part ~= "." then
-			table.insert(parts, part)
-		end
-	end
-	return table.concat(parts, "/")
-end
-
-local function resolveFile(path: string): string?
-	for _, candidate in { path, path .. ".luau", path .. ".lua", path .. "/init.luau" } do
-		if fs.isFile(candidate) then
-			return candidate
-		end
-	end
-	return nil
-end
+local testGlobals
 
 local baseEnv = {
 	assert = assert,
@@ -74,32 +123,32 @@ local baseEnv = {
 	tick = os.clock,
 }
 
-local function loadModule(path: string, extraGlobals: { [string]: any }?): any
-	local file = resolveFile(path)
-	if not file then
-		error(`Could not resolve module "{path}"`)
+local function loadModule(node): any
+	if node == nil or type(node) ~= "table" or node.__path == nil then
+		error("require expects a ModuleScript instance", 2)
 	end
-	file = normalise(file)
+	if node.__isDir then
+		local initNode = childNode(node, "init")
+		if initNode then
+			node = initNode
+		else
+			error(`Cannot require folder {node.__path}`, 2)
+		end
+	end
+	local file = node.__path
 	if moduleCache[file] ~= nil then
 		return moduleCache[file]
 	end
 
-	local dir = string.match(file, "^(.*)/[^/]+$") or "."
 	local env = {}
 	for key, value in baseEnv do
 		env[key] = value
 	end
-	if extraGlobals then
-		for key, value in extraGlobals do
-			env[key] = value
-		end
+	for key, value in testGlobals do
+		env[key] = value
 	end
-	env.require = function(target: string)
-		if string.sub(target, 1, 1) ~= "." then
-			error(`Only relative string requires are supported in shared modules (got "{target}")`)
-		end
-		return loadModule(normalise(`{dir}/{target}`), extraGlobals)
-	end
+	env.script = node
+	env.require = loadModule
 	env._G = env
 
 	local fn = luau.load(fs.readFile(file), { debugName = file, environment = env })
@@ -182,8 +231,6 @@ local totalPass, totalFail = 0, 0
 local failures = {}
 local contextStack = {}
 
-local testGlobals
-
 local function describe(name: string, body: () -> ())
 	table.insert(contextStack, name)
 	local ok, err = pcall(body)
@@ -221,36 +268,42 @@ testGlobals = {
 
 local specFiles = {}
 
-local function scan(dir: string)
+local function scan(dir: string, node)
 	for _, entry in fs.readDir(dir) do
 		local full = `{dir}/{entry}`
 		if fs.isDir(full) then
-			scan(full)
+			scan(full, childNode(node, entry))
 		elseif string.match(entry, "%.spec%.luau$") then
-			table.insert(specFiles, full)
+			local name = string.gsub(entry, "%.luau$", "")
+			table.insert(specFiles, { path = full, node = childNode(node, name) })
 		end
 	end
 end
 
-scan(ROOT)
-table.sort(specFiles)
+scan(ROOT, sharedRoot)
+table.sort(specFiles, function(a, b)
+	return a.path < b.path
+end)
 
 local filter = process.args[1]
 
-for _, file in specFiles do
-	if filter and not string.find(file, filter, 1, true) then
+for _, spec in specFiles do
+	if filter and not string.find(spec.path, filter, 1, true) then
 		continue
 	end
 	local before = totalFail
-	local specBody = loadModule(file, testGlobals)
-	if type(specBody) == "function" then
-		local ok, err = pcall(specBody)
-		if not ok then
+	local ok, result = pcall(loadModule, spec.node)
+	if ok and type(result) == "function" then
+		local bodyOk, err = pcall(result)
+		if not bodyOk then
 			totalFail += 1
-			table.insert(failures, `{file}: spec errored at top level: {err}`)
+			table.insert(failures, `{spec.path}: spec errored at top level: {err}`)
 		end
+	elseif not ok then
+		totalFail += 1
+		table.insert(failures, `{spec.path}: failed to load: {result}`)
 	end
-	print(`{totalFail == before and "PASS" or "FAIL"} {file}`)
+	print(`{totalFail == before and "PASS" or "FAIL"} {spec.path}`)
 end
 
 print("")

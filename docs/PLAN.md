@@ -40,3 +40,25 @@ load via OnInit/OnStart lifecycle.
 
 **Tests:** TableUtil spec exercises deepCopy, reconcile, count, deepFreeze
 and proves the runner works end to end.
+
+---
+
+## Module 0.2: Data layer
+
+**Scope:** ProfileStore session-locked profiles, schema versioning with
+reversible migrations, profile template covering currencies, mythlings,
+eggs, inventory, housing, cosmetics, stats, pity counters, passes,
+purchase ledger, battle pass and settings.
+
+**Server/client split:** all server. `DataService` owns sessions and is the
+single mutation point for currencies (MutateCurrency, with mandatory reason
+string for auditing). Shared: `ProfileSchema` (template + migrations, pure)
+and `PlayerConfig` (tunables).
+
+**Tests:** ProfileSchema spec covers template freshness, required sections,
+ordered migration application, no-op at current version, rejection of
+newer-version profiles, missing-step failure, and reversible field backups.
+
+**Smoke note:** join/leave/rejoin round-trip and BindToClose flush rely on
+ProfileStore's session lock and internal BindToClose hook; verify in Studio
+with the mock store (auto-selected when RunService:IsStudio()).

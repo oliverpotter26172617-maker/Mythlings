@@ -1,6 +1,6 @@
 --!nocheck
 return function()
-	local TableUtil = require("./TableUtil")
+	local TableUtil = require(script.Parent.TableUtil)
 
 	describe("TableUtil.deepCopy", function()
 		it("copies nested tables by value", function()

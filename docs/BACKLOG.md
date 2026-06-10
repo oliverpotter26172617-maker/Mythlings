@@ -3,7 +3,7 @@
 | Module | Name | Status |
 |--------|------|--------|
 | 0.1 | Project scaffold | DONE |
-| 0.2 | Data layer | TODO |
+| 0.2 | Data layer | DONE |
 | 0.3 | Remote framework | TODO |
 | 1.1 | EggConfig + odds UI | TODO |
 | 1.2 | Hatch system | TODO |
