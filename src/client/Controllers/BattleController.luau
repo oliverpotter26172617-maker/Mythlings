@@ -265,9 +265,15 @@ function BattleController:OnStart()
 	})
 	casualButton.Parent = queueGui
 
+	local raidButton = UIKit.button("Boss Raid", Color3.fromRGB(171, 71, 188), {
+		Size = UDim2.new(0, 110, 0, 40),
+		Position = UDim2.new(1, -122, 0.5, 76),
+	})
+	raidButton.Parent = queueGui
+
 	statusLabel = UIKit.label("", 13, {
 		Size = UDim2.new(0, 220, 0, 18),
-		Position = UDim2.new(1, -232, 0.5, 74),
+		Position = UDim2.new(1, -232, 0.5, 122),
 	})
 	statusLabel.Parent = queueGui
 
@@ -285,6 +291,26 @@ function BattleController:OnStart()
 	end)
 	casualButton.Activated:Connect(function()
 		queue("Casual")
+	end)
+	raidButton.Activated:Connect(function()
+		local response = NetClient.Invoke("JoinRaid")
+		if response.Ok then
+			setStatus(`Raid lobby: facing {response.Data.Boss}...`)
+		else
+			setStatus(response.Error or "Could not join the raid.")
+		end
+	end)
+
+	NetClient.On("RaidChest", function(payload)
+		local parts = {}
+		for _, drop in payload.Drops do
+			if drop.Type == "Gems" or drop.Type == "Coins" then
+				table.insert(parts, `{drop.Count} {drop.Type}`)
+			else
+				table.insert(parts, `{drop.Id} x{drop.Count}`)
+			end
+		end
+		setStatus("Raid chest: " .. table.concat(parts, ", "))
 	end)
 
 	NetClient.On("BattleStart", function(payload)

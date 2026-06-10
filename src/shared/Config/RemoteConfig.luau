@@ -63,6 +63,13 @@ local remotes: { [string]: RemoteDef } = {
 
 	-- Server -> client: itemised payout after a battle.
 	BattleRewards = { Kind = "Event", Burst = 1, PerMinute = 1 },
+
+	-- Joins or leaves the weekly boss raid lobby.
+	JoinRaid = { Kind = "Function", Burst = 3, PerMinute = 20 },
+	LeaveRaid = { Kind = "Function", Burst = 3, PerMinute = 20 },
+
+	-- Server -> client: raid chest contents after a clear.
+	RaidChest = { Kind = "Event", Burst = 1, PerMinute = 1 },
 }
 
 return TableUtil.deepFreeze({

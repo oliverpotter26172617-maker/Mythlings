@@ -103,3 +103,13 @@ Standing rules enforced across all modules:
   Potential and exact stats never replicate.
 - Disconnecting mid-match forfeits; the opponent wins and the match
   record notes the forfeiter, so quit-dodging cannot dodge trophy loss.
+
+## Module 3.4: Raids
+
+- JoinRaid takes no arguments; the team, boss and party are entirely
+  server-derived. Chest rolls happen server-side on clear only.
+- CastAbility in raids goes through the same ownership check as arena
+  matches (UnitOwners), so players cannot drive each other's units or
+  the boss.
+- Chest egg drops respect storage limits with a Coins fallback, so the
+  storage cap cannot be bypassed via raids.

@@ -306,7 +306,12 @@ function BattleService:OnInit()
 	end)
 
 	Net.HandleFunction("CastAbility", { Guard.string(48), Guard.string(32) }, function(player, unitId, abilityId)
-		local match = matchesByPlayer[player]
+		local match: any = matchesByPlayer[player]
+		if match == nil then
+			-- Raid units cast through the same remote.
+			local RaidService = require(script.Parent.RaidService) :: any
+			match = RaidService:GetRaidFor(player)
+		end
 		if match == nil then
 			Net.Refuse("You are not in a battle.")
 		end

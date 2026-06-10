@@ -13,7 +13,7 @@
 | 3.1 | Battle core | DONE |
 | 3.2 | Matchmaking + arenas | DONE |
 | 3.3 | Rewards engine | DONE |
-| 3.4 | Boss raids | TODO |
+| 3.4 | Boss raids | DONE |
 | GATE 1 | Vertical slice status report | TODO |
 | 4.1 | Products + passes | TODO |
 | 4.2 | Premium Nursery | TODO |

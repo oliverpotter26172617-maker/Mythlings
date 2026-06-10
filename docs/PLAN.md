@@ -273,3 +273,26 @@ GrowthService:GrantXp and pushes an itemised BattleRewards event.
 
 **Tests:** one describe block per table row plus streak cap, trophy
 floor, loss protection activation and draw handling (15 assertions).
+
+---
+
+## Module 3.4: Boss raids
+
+**Scope:** weekly rotating boss, co-op lobby, raid chest loot.
+
+**Server/client split:** `RaidService` runs a lobby (launches at 4
+players or after 15s with at least 1), merges every member's team into
+one side of the sim against the weekly boss (pure `RaidLogic` derives the
+boss from unix week, no stored state), steps raids on Heartbeat, reuses
+the BattleStart/Events/End wire format and the CastAbility remote, pays
+the Section 3.6 raid row via RewardsService and rolls the chest per
+player on a clear. Egg drops that cannot fit storage fall back to Coins.
+Leaving a live raid forfeits only the leaver's rewards.
+
+**Tests:** rotation determinism and full cycle coverage, chest drop
+distribution within 0.5 points of configured weights over 50,000 chests,
+four-player parties clearing the boss in at least 20 of 30 seeded sims,
+and boss ability ids resolving in AbilityConfig.
+
+**Smoke note:** live 4-player co-op run needs Studio multi-client
+testing; logged for the GATE 1 checklist.
