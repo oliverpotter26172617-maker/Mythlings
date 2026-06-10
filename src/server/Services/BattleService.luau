@@ -43,6 +43,7 @@ type Match = {
 	Arena: Model?,
 	ArenaSlot: number,
 	ReturnCFrames: { [Player]: CFrame },
+	PinnedCFrames: { [Player]: CFrame },
 	Powers: { [Player]: number },
 	TeamMythlings: { [Player]: { string } },
 }
@@ -106,6 +107,24 @@ local function teleportIntoArena(match: Match)
 			match.ReturnCFrames[player] = rootPart.CFrame
 			rootPart.CFrame = slotCFrames[index] :: CFrame
 			rootPart.Anchored = true
+			match.PinnedCFrames[player] = slotCFrames[index] :: CFrame
+		end
+	end
+end
+
+-- Anti-exploit: exploiters own their character physics, so re-pin anyone
+-- who drifts from their arena pad during a match.
+local function enforceArenaPositions(match: Match)
+	for _, player in match.Players do
+		local pinned = match.PinnedCFrames[player]
+		local character = player.Character
+		local rootPart = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+		if pinned and rootPart then
+			if (rootPart.Position - pinned.Position).Magnitude > 8 then
+				rootPart.CFrame = pinned
+				rootPart.AssemblyLinearVelocity = Vector3.zero
+				rootPart.Anchored = true
+			end
 		end
 	end
 end
@@ -204,6 +223,7 @@ local function startMatch(mode: string, recordA: QueueRecord, recordB: QueueReco
 		Arena = nil,
 		ArenaSlot = slot,
 		ReturnCFrames = {},
+		PinnedCFrames = {},
 		Powers = { [playerA] = buildA.Power :: number, [playerB] = buildB.Power :: number },
 		TeamMythlings = { [playerA] = {}, [playerB] = {} },
 	}
@@ -348,6 +368,10 @@ function BattleService:OnStart()
 
 		for _, match in table.clone(activeMatches) do
 			match.Sim:step(dt)
+
+			if shouldBroadcast then
+				enforceArenaPositions(match)
+			end
 
 			if shouldBroadcast or match.Sim:isFinished() then
 				local events = match.Sim:getEvents()

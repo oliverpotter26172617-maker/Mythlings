@@ -175,3 +175,54 @@ Standing rules enforced across all modules:
   per-friend daily cap recorded on the giver before granting. The
   receiver's storage limits apply through Grants (Coins fallback).
 - The group bonus flag is set only from a server-side IsInGroup check.
+
+## Module 6.4: Hardening audit
+
+Full remote inventory at audit time. Every remote is registered in
+RemoteConfig with a rate limit and validated arguments; the acting player
+is always the engine-provided caller.
+
+| Remote | Kind | Client args (validated) | Server checks |
+|--------|------|--------------------------|---------------|
+| BuyEgg | Function | tier string<=32 | tier exists, funds, egg storage |
+| StartIncubation | Function | eggId<=16 | owned, not incubating, slot free |
+| ClaimHatch | Function | eggId<=16 | owned, timer elapsed (server clock) |
+| InstantFinishHatch | Function | eggId<=16 | owned, storage, server-priced Gems |
+| SetActiveMythlings | Function | array<=3 of id<=16 | owned, unique, cap |
+| BuyFood | Function | id<=32, int 1..20 | item exists, funds |
+| FeedMythling | Function | ids<=16/32 | both owned, inventory>=1 |
+| BreedMythlings | Function | two ids<=16 | owned, distinct, Adult+, rested, storage |
+| SkipBreedCooldown | Function | id<=16 | owned, server-priced Gems, time remains |
+| JoinQueue | Function | enum Ranked/Casual | team valid, not in match |
+| LeaveQueue | Function | none | none needed |
+| CastAbility | Function | unitId<=48, ability<=32 | unit owned in live match, sim validates readiness/aliveness |
+| JoinRaid / LeaveRaid | Function | none | team valid, not already raiding |
+| BuyNurseryMythling | Function | int 1..8 | weekly offer, Gems, storage, hatch-equal Potential roll |
+| ClaimBattlePassTier | Function | int 1..50, enum track | reached, owned premium, claim-once |
+| BuyPlotUpgrade | Function | none | next tier exists, funds |
+| BuyPlotTheme / SetPlotTheme | Function | id<=32 | exists, owned/VIP, funds |
+| BuyFurniture | Function | id<=32 | exists, funds |
+| PlaceFurniture | Function | id<=32, ints +-100, rot enum | inventory, bounds, grid, overlap, cap |
+| RemoveFurniture | Function | guid<=16 | exists on own plot |
+| ClaimPlotIncome | Function | none | server-computed window, claim-once |
+| VisitFriendPlot | Function | int>=1 | friendship, presence, daily pair cap |
+| ClaimQuest | Function | enum scope, id<=32 | active, complete, claim-once |
+| GiftEgg | Function | int>=1 | friendship, presence, daily pair cap |
+| BuyCosmetic | Function | id<=32 | exists, purchasable, funds, not owned |
+| EquipAvatarCosmetic | Function | slot<=16, id<=32? | slot/layer/ownership |
+| EquipMythlingCosmetic | Function | ids + slot | mythling owned, slot/layer/ownership |
+| BuyArenaShopItem | Function | int 1..8 | weekly slot, tokens, dupes |
+| Server->client events | Event | n/a | no server listeners attached |
+
+Hardening actions taken in this pass:
+
+- Arena position enforcement: players are anchored on their pads and the
+  server re-pins anyone drifting more than 8 studs during a match
+  (exploiters own their character physics; the server now corrects it).
+- Reviewed every numeric client input for clamps: quantities, tiers,
+  slots, indexes and coordinates are all range-guarded; strings are all
+  length-capped; remaining integers are ids validated by lookup.
+- Confirmed no remote accepts a player identity, price, odds value, stat
+  or reward amount from the client anywhere in the codebase.
+- Net violation counters remain available via Net.GetViolationCounts()
+  and all violations are warn-logged with player attribution.

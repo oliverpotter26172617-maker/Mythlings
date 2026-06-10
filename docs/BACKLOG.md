@@ -24,7 +24,7 @@
 | 6.1 | Quests + calendar + gifting + group bonus | DONE |
 | 6.2 | Onboarding | DONE |
 | 6.3 | Analytics + telemetry | DONE |
-| 6.4 | Anti-exploit hardening | TODO |
+| 6.4 | Anti-exploit hardening | DONE |
 | 6.5 | Performance pass | TODO |
 | 6.6 | Launch checklist | TODO |
 | GATE 2 | Launch candidate status report | TODO |
