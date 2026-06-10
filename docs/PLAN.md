@@ -319,3 +319,25 @@ are pasted into MonetisationConfig.
 
 **Tests:** receipt idempotency (replay, independence, crash-during-grant),
 VIP coin multiplier, hatch time division, daily stipend gating.
+
+---
+
+## Module 4.2: Premium Nursery
+
+**Scope:** weekly rotating direct-purchase Mythlings (2 Epics + 1
+Legendary per week) for Gems, with the locked fairness constraints.
+
+**Design:** offers derive from the unix week index in pure NurseryLogic,
+so the rotation needs no stored state and client/server always agree.
+Purchases use the same MythlingFactory and the same 1..100 Potential roll
+as hatching: there is no purchasable stat advantage, only access. The
+spec's three guardrails hold by construction and by test: identical stat
+ceiling, Power brackets apply (Nursery Mythlings are ordinary records),
+and free-path availability from the Mythic egg.
+
+**Remotes:** BuyNurseryMythling (burst 3, 20/min).
+
+**Tests:** the build fails if any Nursery species is missing from the
+Mythic egg's free pool or if a record carries its own stat fields;
+rotation determinism, week-over-week change, Epic/Legendary-only
+offers, and purchase validation (bad index, short Gems, full storage).

@@ -123,3 +123,11 @@ Standing rules enforced across all modules:
   client cannot claim a pass it does not own, and API failures never
   revoke a cached pass mid-session.
 - Unknown ProductIds return NotProcessedYet and are logged.
+
+## Module 4.2: Premium Nursery
+
+- The client sends only a slot index (1..8 by Guard); price and species
+  come from the server-derived weekly offer list, so price and species
+  spoofing are impossible.
+- Potential is rolled server-side with the hatch range; no purchase can
+  exceed the free-path stat ceiling (unit tested as a build gate).

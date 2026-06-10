@@ -70,6 +70,9 @@ local remotes: { [string]: RemoteDef } = {
 
 	-- Server -> client: raid chest contents after a clear.
 	RaidChest = { Kind = "Event", Burst = 1, PerMinute = 1 },
+
+	-- Buys this week's Premium Nursery offer by slot index.
+	BuyNurseryMythling = { Kind = "Function", Burst = 3, PerMinute = 20 },
 }
 
 return TableUtil.deepFreeze({
