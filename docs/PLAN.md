@@ -296,3 +296,26 @@ and boss ability ids resolving in AbilityConfig.
 
 **Smoke note:** live 4-player co-op run needs Studio multi-client
 testing; logged for the GATE 1 checklist.
+
+---
+
+## Module 4.1: Products + passes
+
+**Scope:** all Section 3.9 SKUs: four Gem packs, Battle Pass premium
+product, and the VIP / Hatch Speed / Triple Hatch / Auto-Hatch / Extra
+Storage passes, with idempotent receipts.
+
+**Design:** `MonetisationLogic.applyReceiptOnce` records the ReceiptId in
+the profile ledger before granting, so replayed receipts grant exactly
+once even across a mid-grant crash. `MonetisationService` owns
+ProcessReceipt, refreshes the pass cache on join and on purchase
+(ownership only ever turns on; API failures never revoke), pays the VIP
+daily Gem stipend once per UTC day and runs the Auto-Hatch loop. Pass
+benefits wired: VIP +25% on Coin sources (battle rewards), Hatch Speed
+divides incubation time, Triple Hatch and Extra Storage were already
+config-driven, Auto-Hatch claims finished eggs and cycles Basic eggs.
+Asset ids ship as 0 ("coming soon" client-side) until the dashboard ids
+are pasted into MonetisationConfig.
+
+**Tests:** receipt idempotency (replay, independence, crash-during-grant),
+VIP coin multiplier, hatch time division, daily stipend gating.

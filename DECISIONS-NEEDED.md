@@ -35,3 +35,12 @@ advantage (enforced by a unit test).
   win resets it (the player-friendly reading).
 - Draws (dead-even timeout) pay the loss consolation row, move no
   trophies and freeze both streaks.
+
+## 4.1 Dev product scope
+
+Instant hatch, breeding skip and raid retries are implemented as Gem
+sinks (the spec prices instant hatch in Gems), so the only consumable
+Robux products are the four Gem packs and the Battle Pass premium
+unlock. A direct "instant hatch" Robux product would need a purchase
+context handshake; deferred unless wanted. Raids are freely retryable,
+so a paid raid retry has nothing to unlock; omitted.

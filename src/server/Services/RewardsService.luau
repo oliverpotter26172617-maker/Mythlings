@@ -5,6 +5,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local MatchmakingLogic = require(ReplicatedStorage.Shared.Logic.MatchmakingLogic)
+local MonetisationLogic = require(ReplicatedStorage.Shared.Logic.MonetisationLogic)
 local RewardsLogic = require(ReplicatedStorage.Shared.Logic.RewardsLogic)
 local Net = require(script.Parent.Parent.Lib.Net)
 
@@ -44,8 +45,10 @@ function RewardsService:ApplyReward(
 		Rng = rng,
 	})
 
-	if result.Coins > 0 then
-		DataService:MutateCurrency(player, "Coins", result.Coins, `Battle:{mode}:{outcome}`)
+	-- VIP boosts Coin sources (the table's base values stay untouched).
+	local coins = math.floor(result.Coins * MonetisationLogic.coinMultiplier(data.Passes))
+	if coins > 0 then
+		DataService:MutateCurrency(player, "Coins", coins, `Battle:{mode}:{outcome}`)
 	end
 	if result.BattleTokens > 0 then
 		DataService:MutateCurrency(player, "BattleTokens", result.BattleTokens, `Battle:{mode}:{outcome}`)
@@ -70,7 +73,7 @@ function RewardsService:ApplyReward(
 	Net.FireClient("BattleRewards", player, {
 		Mode = mode,
 		Outcome = outcome,
-		Coins = result.Coins,
+		Coins = coins,
 		TrophyDelta = result.TrophyDelta,
 		BattleTokens = result.BattleTokens,
 		XpPerMythling = result.XpPerMythling,

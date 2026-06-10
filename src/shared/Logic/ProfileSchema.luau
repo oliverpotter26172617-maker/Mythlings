@@ -96,6 +96,7 @@ function ProfileSchema.buildTemplate(): { [string]: any }
 		Flags = {
 			OnboardingStep = 0,
 			StarterEggGranted = false,
+			LastVipStipendDay = 0,
 		},
 
 		MigrationBackups = {},

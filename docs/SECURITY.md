@@ -113,3 +113,13 @@ Standing rules enforced across all modules:
   the boss.
 - Chest egg drops respect storage limits with a Coins fallback, so the
   storage cap cannot be bypassed via raids.
+
+## Module 4.1: Monetisation
+
+- ProcessReceipt grants through applyReceiptOnce: the ledger write
+  happens before the grant, so duplicate receipt delivery (a Roblox
+  guarantee you must handle) can never double-grant.
+- Pass benefits are read from the server-side profile cache only; the
+  client cannot claim a pass it does not own, and API failures never
+  revoke a cached pass mid-session.
+- Unknown ProductIds return NotProcessedYet and are logged.

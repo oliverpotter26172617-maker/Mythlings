@@ -11,6 +11,8 @@ local PlayerConfig = require(ReplicatedStorage.Shared.Config.PlayerConfig)
 local StatConfig = require(ReplicatedStorage.Shared.Config.StatConfig)
 local Guard = require(ReplicatedStorage.Shared.Logic.Guard)
 local HatchLogic = require(ReplicatedStorage.Shared.Logic.HatchLogic)
+local MonetisationConfig = require(ReplicatedStorage.Shared.Config.MonetisationConfig)
+local MonetisationLogic = require(ReplicatedStorage.Shared.Logic.MonetisationLogic)
 local MythlingFactory = require(ReplicatedStorage.Shared.Logic.MythlingFactory)
 local Net = require(script.Parent.Parent.Lib.Net)
 
@@ -174,7 +176,7 @@ function HatchService:OnInit()
 		if incubatingCount(data) >= incubationSlots(data) then
 			Net.Refuse("All your incubation slots are busy.")
 		end
-		egg.HatchesAt = os.time() + hatchMinutesFor(egg) * 60
+		egg.HatchesAt = os.time() + MonetisationLogic.hatchSeconds(hatchMinutesFor(egg) * 60, data.Passes)
 		DataService:Sync(player)
 		return { EggId = eggId, HatchesAt = egg.HatchesAt }
 	end)
@@ -215,6 +217,39 @@ function HatchService:OnInit()
 		egg.HatchesAt = os.time()
 		return resolveHatch(player, data, eggId)
 	end)
+end
+
+-- Auto-Hatch pass: claims finished eggs and keeps Basic-tier eggs cycling
+-- through free incubation slots while the player is in game. Called on a
+-- timer by MonetisationService for pass owners only.
+function HatchService:AutoHatchTick(player: Player)
+	local data = DataService:GetData(player)
+	if data == nil or not data.Passes.AutoHatch then
+		return
+	end
+	local now = os.time()
+
+	-- Claim everything that finished. resolveHatch refuses (errors) when
+	-- storage is full; stop quietly in that case.
+	for eggId, egg in data.Eggs do
+		if egg.HatchesAt ~= nil and now >= egg.HatchesAt then
+			local ok = pcall(resolveHatch, player, data, eggId)
+			if not ok then
+				return
+			end
+		end
+	end
+
+	-- Start stored Basic eggs while slots are free.
+	for _, egg in data.Eggs do
+		if incubatingCount(data) >= incubationSlots(data) then
+			break
+		end
+		if egg.HatchesAt == nil and egg.Tier == MonetisationConfig.AutoHatchTier then
+			egg.HatchesAt = now + MonetisationLogic.hatchSeconds(hatchMinutesFor(egg) * 60, data.Passes)
+		end
+	end
+	DataService:Sync(player)
 end
 
 return HatchService
