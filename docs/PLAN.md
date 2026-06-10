@@ -83,3 +83,28 @@ injectable clock) and `Logic/Guard` (validators).
 configured burst capacity, refill over time, per-key independence and
 backwards-clock robustness. Guard spec covers NaN/infinity rejection,
 ranges, enums, oversized payload bombs and tuple validation.
+
+---
+
+## Module 1.1: EggConfig + odds UI
+
+**Scope:** all seven egg tiers with locked prices, hatch timers and odds
+tables; server-side purchase flow; pre-purchase odds panel.
+
+**Server/client split:** `EggService.BuyEgg` (RemoteFunction) validates via
+pure `EggShopLogic` then debits through DataService and appends the egg
+record. Client `EggShopController` renders the shop and the odds panel
+directly from `EggConfig`, so displayed odds cannot drift from rolled odds.
+`DataService:Sync` pushes sanitised snapshots (`ProfileSanitiser` strips
+MigrationBackups, PurchaseLedger and every hidden Potential value).
+
+**Remotes:** BuyEgg (Function, burst 4, 30/min).
+
+**Config:** EggConfig (tiers, pity threshold 50 to Epic+, instant hatch
+0.4 Gems/min), RarityConfig, MythlingConfig (33 species), StatConfig.
+
+**Tests:** ConfigValidation spec fails the build on odds not summing to
+100, unknown rarities, tiers that cannot honour pity, spreads not summing
+to 1, or rarities without species. EggShopLogic spec covers insufficient
+Coins/Gems, unknown tier, storage full and exact cost reporting.
+ProfileSanitiser spec proves Potential never replicates.

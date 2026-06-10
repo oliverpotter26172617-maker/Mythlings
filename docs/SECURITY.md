@@ -35,3 +35,13 @@ Standing rules enforced across all modules:
   Net.Refuse, which is the only path for player-visible reasons.
 - ProfileSync: server to client push only; the server attaches no
   OnServerEvent listener, so client sends on it are inert.
+
+## Module 1.1: Egg purchases
+
+- `BuyEgg(tierId)`: tier must be a string of 32 chars max and exist in
+  EggConfig. Cost comes from config only; the client cannot name a price.
+  Insufficient funds and full storage refuse before any mutation. No yields
+  between validation and debit, so double-spend racing is impossible.
+- Rate limit: burst 4, 30/min. Spam is throttled and counted.
+- Hidden Potential and server ledgers never reach the client: ProfileSync
+  payloads pass through ProfileSanitiser (unit tested).

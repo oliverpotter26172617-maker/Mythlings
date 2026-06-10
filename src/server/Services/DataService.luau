@@ -17,6 +17,8 @@ local RunService = game:GetService("RunService")
 local ProfileStore = require(ReplicatedStorage.Packages.ProfileStore)
 local GoodSignal = require(ReplicatedStorage.Packages.GoodSignal)
 local ProfileSchema = require(ReplicatedStorage.Shared.Logic.ProfileSchema)
+local ProfileSanitiser = require(ReplicatedStorage.Shared.Logic.ProfileSanitiser)
+local Net = require(script.Parent.Parent.Lib.Net)
 
 local STORE_NAME = "PlayerData"
 
@@ -71,6 +73,7 @@ local function onPlayerAdded(player: Player)
 
 	profiles[player] = profile
 	DataService.ProfileLoaded:Fire(player, profile)
+	DataService:Sync(player)
 end
 
 function DataService:OnInit()
@@ -141,6 +144,16 @@ function DataService:MutateCurrency(player: Player, currency: string, delta: num
 	end
 	data.Currencies[currency] = newBalance
 	return true
+end
+
+-- Pushes the sanitised profile snapshot to the client. Call after any
+-- mutation a player should see reflected in their UI.
+function DataService:Sync(player: Player)
+	local data = self:GetData(player)
+	if data == nil then
+		return
+	end
+	Net.FireClient("ProfileSync", player, ProfileSanitiser.sanitise(data))
 end
 
 function DataService:GetBalance(player: Player, currency: string): number?

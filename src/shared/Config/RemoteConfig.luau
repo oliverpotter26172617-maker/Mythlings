@@ -18,6 +18,9 @@ local remotes: { [string]: RemoteDef } = {
 	-- Server -> client push of the player's sanitised profile snapshot and
 	-- subsequent deltas. Client never sends on this remote.
 	ProfileSync = { Kind = "Event", Burst = 1, PerMinute = 1 },
+
+	-- Buys one egg of a given tier with Coins or Gems (server decides cost).
+	BuyEgg = { Kind = "Function", Burst = 4, PerMinute = 30 },
 }
 
 return TableUtil.deepFreeze({
