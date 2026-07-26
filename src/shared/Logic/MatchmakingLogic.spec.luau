@@ -73,6 +73,19 @@ return function()
 			expect(pairs_[1][2].UserId).to.equal(3)
 		end)
 
+		it("breaks equal wait-time ties deterministically by UserId", function()
+			-- All queued in the same tick; lowest UserId pair should form
+			-- regardless of insertion order.
+			local queue = {
+				entry(30, 100, 1000, 5),
+				entry(10, 100, 1000, 5),
+				entry(20, 100, 1000, 5),
+			}
+			local pairs_ = MatchmakingLogic.findPairs(queue)
+			expect(pairs_[1][1].UserId).to.equal(10)
+			expect(pairs_[1][2].UserId).to.equal(20)
+		end)
+
 		it("returns everything as leftovers when nothing matches", function()
 			local queue = { entry(1, 0, 100, 1), entry(2, 5000, 100, 2) }
 			local pairs_, leftovers = MatchmakingLogic.findPairs(queue)

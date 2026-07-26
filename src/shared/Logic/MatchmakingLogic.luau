@@ -42,7 +42,12 @@ end
 function MatchmakingLogic.findPairs(queue: { QueueEntry }): ({ { QueueEntry } }, { QueueEntry })
 	local sorted = table.clone(queue)
 	table.sort(sorted, function(x, y)
-		return x.QueuedAt < y.QueuedAt
+		if x.QueuedAt ~= y.QueuedAt then
+			return x.QueuedAt < y.QueuedAt
+		end
+		-- Entries queued in the same scan tick share QueuedAt; table.sort is
+		-- not stable, so break the tie on UserId to keep pairing reproducible.
+		return x.UserId < y.UserId
 	end)
 
 	local pairs_: { { QueueEntry } } = {}
