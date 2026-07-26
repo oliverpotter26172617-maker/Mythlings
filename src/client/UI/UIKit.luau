@@ -73,6 +73,25 @@ function UIKit.label(text: string, textSize: number, props: { [string]: any }?):
 	return label
 end
 
+-- Connects Activated with a re-entrancy guard. Handlers that Invoke the
+-- server yield, and Activated refires during that yield, so a double tap on
+-- a shop or claim button could fire the action twice. This drops presses
+-- that arrive while a previous press is still being handled.
+function UIKit.onActivated(button: GuiButton, handler: () -> ()): RBXScriptConnection
+	local running = false
+	return button.Activated:Connect(function()
+		if running then
+			return
+		end
+		running = true
+		local ok, err = pcall(handler)
+		running = false
+		if not ok then
+			warn(`UIKit.onActivated handler error: {err}`)
+		end
+	end)
+end
+
 function UIKit.button(text: string, colour: Color3, props: { [string]: any }?): TextButton
 	local button = UIKit.create("TextButton", {
 		AutoButtonColor = true,

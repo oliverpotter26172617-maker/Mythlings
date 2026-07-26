@@ -243,14 +243,22 @@ function HatchController:OnStart()
 	})
 	toggle.Parent = toggleGui
 	toggle.Activated:Connect(function()
+		if not screenGui.Enabled then
+			local snapshot = ProfileController:Get()
+			if snapshot then
+				rebuildList(snapshot)
+			end
+		end
 		screenGui.Enabled = not screenGui.Enabled
 	end)
 
-	ProfileController.Changed:Connect(rebuildList)
-	local existing = ProfileController:Get()
-	if existing then
-		rebuildList(existing)
-	end
+	-- Rebuild only while the panel is open; the timer loop below already
+	-- refreshes countdowns on the same condition.
+	ProfileController.Changed:Connect(function(snapshot)
+		if screenGui.Enabled then
+			rebuildList(snapshot)
+		end
+	end)
 
 	local accumulator = 0
 	RunService.Heartbeat:Connect(function(dt)
