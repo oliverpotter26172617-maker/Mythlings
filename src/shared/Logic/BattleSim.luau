@@ -111,6 +111,7 @@ function BattleSim.new(teamA: { UnitSpec }, teamB: { UnitSpec }, rng: Rng)
 	local self = setmetatable({}, BattleSim)
 	self._rng = rng
 	self._time = 0
+	self._carry = 0
 	self._units = {} :: { Unit }
 	self._unitsById = {} :: { [string]: Unit }
 	self._events = {} :: { BattleEvent }
@@ -276,76 +277,96 @@ local function finish(self: any, winner: number, timedOut: boolean)
 	pushEvent(self, { Type = "End", Time = self._time, Winner = winner })
 end
 
--- Advances the simulation by dt seconds (internally quantised to the
--- configured tick interval).
+-- Runs exactly one fixed TickInterval of simulation. Every step funnels
+-- through here so a battle's outcome depends only on the seed and the total
+-- elapsed time, never on how the caller batches dt into steps.
+local function runTick(self: any)
+	self._time += BattleConfig.TickInterval
+
+	for _, unit in self._units :: { Unit } do
+		if unit.Hp <= 0 then
+			continue
+		end
+		local enemies = aliveEnemies(self, unit.Team)
+		if #enemies == 0 then
+			break
+		end
+
+		-- Manual queued casts fire first.
+		if #unit.QueuedCasts > 0 then
+			local abilityId = table.remove(unit.QueuedCasts, 1) :: string
+			for _, state in unit.Abilities do
+				if state.AbilityId == abilityId and state.ReadyAt <= self._time then
+					castAbility(self, unit, state, pickTarget(enemies))
+					break
+				end
+			end
+		end
+
+		-- Auto casting: strongest ready ability for Auto units; only
+		-- the basic Strike for Manual units.
+		local bestState: AbilityState? = nil
+		local bestPower = -1
+		for _, state in unit.Abilities do
+			if state.ReadyAt > self._time then
+				continue
+			end
+			local ability = AbilityConfig.Abilities[state.AbilityId]
+			local isBasic = state.AbilityId == "Strike"
+			if unit.CastPolicy == "Manual" and not isBasic then
+				continue
+			end
+			if ability.Power > bestPower then
+				bestPower = ability.Power
+				bestState = state
+			end
+		end
+		if bestState ~= nil then
+			enemies = aliveEnemies(self, unit.Team)
+			if #enemies > 0 then
+				castAbility(self, unit, bestState, pickTarget(enemies))
+			end
+		end
+	end
+
+	local aliveA = teamAlive(self, 1)
+	local aliveB = teamAlive(self, 2)
+	if not aliveA or not aliveB then
+		local winner = if aliveA then 1 elseif aliveB then 2 else 0
+		finish(self, winner, false)
+	elseif self._time >= BattleConfig.MaxDurationSeconds then
+		local fractionA = teamHpFraction(self, 1)
+		local fractionB = teamHpFraction(self, 2)
+		local winner = if fractionA > fractionB then 1 elseif fractionB > fractionA then 2 else 0
+		finish(self, winner, true)
+	end
+end
+
+-- Advances the simulation by dt seconds. Time is quantised into fixed
+-- BattleConfig.TickInterval steps with any sub-tick remainder carried
+-- forward, so a battle plays out identically whether it is stepped once with
+-- a large dt, once per frame with a small dt, or run to completion. Without
+-- this, tick cadence (and therefore ability fires and outcomes) would depend
+-- on the caller's frame rate.
 function BattleSim.step(self: any, dt: number)
 	if self._finished then
 		return
 	end
 
-	local remaining = dt
-	while remaining > 0 and not self._finished do
-		local tick = math.min(BattleConfig.TickInterval, remaining)
-		remaining -= tick
-		self._time += tick
+	self._carry += dt
+	-- The epsilon absorbs floating-point error so that, for example, sixty
+	-- steps of 1/60 produce exactly ten ticks per second rather than nine.
+	local ticks = math.floor(self._carry / BattleConfig.TickInterval + 1e-6)
+	if ticks <= 0 then
+		return
+	end
+	self._carry -= ticks * BattleConfig.TickInterval
 
-		for _, unit in self._units :: { Unit } do
-			if unit.Hp <= 0 then
-				continue
-			end
-			local enemies = aliveEnemies(self, unit.Team)
-			if #enemies == 0 then
-				break
-			end
-
-			-- Manual queued casts fire first.
-			if #unit.QueuedCasts > 0 then
-				local abilityId = table.remove(unit.QueuedCasts, 1) :: string
-				for _, state in unit.Abilities do
-					if state.AbilityId == abilityId and state.ReadyAt <= self._time then
-						castAbility(self, unit, state, pickTarget(enemies))
-						break
-					end
-				end
-			end
-
-			-- Auto casting: strongest ready ability for Auto units; only
-			-- the basic Strike for Manual units.
-			local bestState: AbilityState? = nil
-			local bestPower = -1
-			for _, state in unit.Abilities do
-				if state.ReadyAt > self._time then
-					continue
-				end
-				local ability = AbilityConfig.Abilities[state.AbilityId]
-				local isBasic = state.AbilityId == "Strike"
-				if unit.CastPolicy == "Manual" and not isBasic then
-					continue
-				end
-				if ability.Power > bestPower then
-					bestPower = ability.Power
-					bestState = state
-				end
-			end
-			if bestState ~= nil then
-				enemies = aliveEnemies(self, unit.Team)
-				if #enemies > 0 then
-					castAbility(self, unit, bestState, pickTarget(enemies))
-				end
-			end
+	for _ = 1, ticks do
+		if self._finished then
+			break
 		end
-
-		local aliveA = teamAlive(self, 1)
-		local aliveB = teamAlive(self, 2)
-		if not aliveA or not aliveB then
-			local winner = if aliveA then 1 elseif aliveB then 2 else 0
-			finish(self, winner, false)
-		elseif self._time >= BattleConfig.MaxDurationSeconds then
-			local fractionA = teamHpFraction(self, 1)
-			local fractionB = teamHpFraction(self, 2)
-			local winner = if fractionA > fractionB then 1 elseif fractionB > fractionA then 2 else 0
-			finish(self, winner, true)
-		end
+		runTick(self)
 	end
 end
 
