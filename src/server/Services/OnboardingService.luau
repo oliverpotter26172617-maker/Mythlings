@@ -10,6 +10,7 @@ local StatConfig = require(ReplicatedStorage.Shared.Config.StatConfig)
 local HatchLogic = require(ReplicatedStorage.Shared.Logic.HatchLogic)
 local OnboardingLogic = require(ReplicatedStorage.Shared.Logic.OnboardingLogic)
 local Analytics = require(script.Parent.Parent.Lib.Analytics)
+local Grants = require(script.Parent.Parent.Lib.Grants)
 
 local OnboardingService = {}
 
@@ -20,22 +21,17 @@ local function rng(): number
 	return serverRandom:NextNumber()
 end
 
-local function grantStarterEgg(data: { [string]: any })
+-- Grants the free Rare starter egg while respecting the storage cap. Returns
+-- true when it was stored; a full inventory (only possible for an already
+-- established profile) simply defers the grant to a later join.
+local function grantStarterEgg(data: { [string]: any }): boolean
 	local speciesId = HatchLogic.pickSpecies(MythlingConfig.Species, "Rare", nil, 0.5, rng)
-	local eggId = `E{data.NextEggId}`
-	data.NextEggId += 1
-	data.Eggs[eggId] = {
-		Tier = "Gift",
-		ObtainedAt = os.time(),
-		HatchesAt = nil,
-		HatchMinutes = OnboardingConfig.StarterEggHatchMinutes,
-		Outcome = {
-			SpeciesId = speciesId,
-			Potential = HatchLogic.rollPotential(StatConfig.PotentialMin, StatConfig.PotentialMax, rng),
-			Shiny = false,
-		},
+	local outcome = {
+		SpeciesId = speciesId,
+		Potential = HatchLogic.rollPotential(StatConfig.PotentialMin, StatConfig.PotentialMax, rng),
+		Shiny = false,
 	}
-	data.Flags.StarterEggGranted = true
+	return Grants.trySealedEgg(data, "Gift", OnboardingConfig.StarterEggHatchMinutes, outcome, os.time())
 end
 
 -- Called by QuestService whenever a metric fires, so onboarding rides the
@@ -73,8 +69,10 @@ function OnboardingService:OnStart()
 		-- First-session generosity: the free Rare egg lands immediately,
 		-- even for profiles that somehow skipped the flow.
 		if not data.Flags.StarterEggGranted then
-			grantStarterEgg(data)
-			DataService:Sync(player)
+			if grantStarterEgg(data) then
+				data.Flags.StarterEggGranted = true
+				DataService:Sync(player)
+			end
 		end
 	end)
 end
