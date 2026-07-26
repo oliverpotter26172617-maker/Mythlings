@@ -57,6 +57,18 @@ return function()
 			expect(limiter:allow("Hatch:1", 0)).to.equal(true)
 		end)
 
+		it("clears a player's buckets without hitting a same-prefixed id", function()
+			-- Net keys buckets "UserId:RemoteName"; clearing "12:" on leave
+			-- must not also drop user 123's bucket.
+			local limiter = RateLimiter.new(1, 0.001)
+			expect(limiter:allow("12:BuyEgg", 0)).to.equal(true)
+			expect(limiter:allow("123:BuyEgg", 0)).to.equal(true)
+			limiter:clear("12:")
+			-- User 12 is reset (allowed again); user 123 is untouched (still throttled).
+			expect(limiter:allow("12:BuyEgg", 0)).to.equal(true)
+			expect(limiter:allow("123:BuyEgg", 0)).to.equal(false)
+		end)
+
 		it("is robust against a clock going backwards", function()
 			local limiter = RateLimiter.new(2, 1)
 			expect(limiter:allow("k", 100)).to.equal(true)
