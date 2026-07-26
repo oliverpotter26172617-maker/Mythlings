@@ -83,7 +83,7 @@ local function showDetail(tierId: string)
 		LayoutOrder = order,
 	})
 	buyButton.Parent = detailFrame
-	buyButton.Activated:Connect(function()
+	UIKit.onActivated(buyButton, function()
 		buyButton.Text = "Buying..."
 		local response = NetClient.Invoke("BuyEgg", tierId)
 		buyButton.Text = `Buy for {tier.Price.Amount} {tier.Price.Currency}`

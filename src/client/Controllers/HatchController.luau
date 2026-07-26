@@ -129,7 +129,7 @@ local function rebuildList(snapshot: { [string]: any })
 		})
 		action.Parent = row
 
-		action.Activated:Connect(function()
+		UIKit.onActivated(action, function()
 			local current = (ProfileController:Get() :: any).Eggs[eggId]
 			if current == nil then
 				return

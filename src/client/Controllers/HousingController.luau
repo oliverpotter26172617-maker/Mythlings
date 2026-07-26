@@ -114,7 +114,7 @@ function HousingController:OnStart()
 		Position = UDim2.new(0.35, 0, 1, -66),
 	})
 	upgradeButton.Parent = frame
-	upgradeButton.Activated:Connect(function()
+	UIKit.onActivated(upgradeButton, function()
 		local response = NetClient.Invoke("BuyPlotUpgrade")
 		setStatus(if response.Ok then "Plot upgraded!" else response.Error or "Upgrade failed.", response.Ok)
 	end)
@@ -124,7 +124,7 @@ function HousingController:OnStart()
 		Position = UDim2.new(0.68, 0, 1, -66),
 	})
 	incomeButton.Parent = frame
-	incomeButton.Activated:Connect(function()
+	UIKit.onActivated(incomeButton, function()
 		local response = NetClient.Invoke("ClaimPlotIncome")
 		if response.Ok then
 			setStatus(`Collected {response.Data.Coins} Coins from your Mythlings!`, true)
@@ -167,7 +167,7 @@ function HousingController:OnStart()
 			TextSize = 13,
 		})
 		buyButton.Parent = row
-		buyButton.Activated:Connect(function()
+		UIKit.onActivated(buyButton, function()
 			local response = NetClient.Invoke("BuyFurniture", itemId)
 			setStatus(
 				if response.Ok then `Bought a {item.DisplayName}.` else response.Error or "Could not buy.",
@@ -181,7 +181,7 @@ function HousingController:OnStart()
 			TextSize = 13,
 		})
 		placeButton.Parent = row
-		placeButton.Activated:Connect(function()
+		UIKit.onActivated(placeButton, function()
 			local x, z = findFreeSpot(itemId)
 			if x == nil then
 				setStatus("No room on your plot for that.", false)
