@@ -65,6 +65,15 @@ return function()
 			expect(data.SchemaVersion).to.equal(1)
 		end)
 
+		it("stamps the version even when no migration runs", function()
+			-- A profile missing SchemaVersion still records the target version
+			-- instead of leaving it unset.
+			local data = {}
+			local applied = ProfileSchema.runMigrations(data, {}, 1)
+			expect(#applied).to.equal(0)
+			expect(data.SchemaVersion).to.equal(1)
+		end)
+
 		it("rejects profiles from a newer schema", function()
 			local data = { SchemaVersion = 99 }
 			expect(function()
