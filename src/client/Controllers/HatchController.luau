@@ -237,13 +237,7 @@ function HatchController:OnStart()
 	UIKit.rounded(12).Parent = revealFrame
 	revealFrame.Parent = screenGui
 
-	local toggleGui = UIKit.create("ScreenGui", { Name = "HatcheryToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("Hatchery", UIKit.Palette.Positive, {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, 28),
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("Hatchery", UIKit.Palette.Positive, 28)
 	toggle.Activated:Connect(function()
 		if not screenGui.Enabled then
 			local snapshot = ProfileController:Get()

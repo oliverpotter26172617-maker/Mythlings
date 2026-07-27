@@ -75,4 +75,21 @@ function IncomeLogic.tryRecordVisit(data: { [string]: any }, friendUserId: numbe
 	return true, nil
 end
 
+-- Host-side visit bonus bookkeeping. The host earns a bonus each time a
+-- friend visits, capped per day like the visitor side so a plot with many
+-- friends cannot earn unbounded Coins. Returns true when the host may be
+-- paid. Tolerant of profiles predating the Host* fields (treated as 0).
+function IncomeLogic.tryRecordHostBonus(data: { [string]: any }, now: number): boolean
+	local day = math.floor(now / 86400)
+	if data.Housing.HostBonusDay ~= day then
+		data.Housing.HostBonusDay = day
+		data.Housing.HostBonusCount = 0
+	end
+	if data.Housing.HostBonusCount >= HousingConfig.VisitBonusDailyCap then
+		return false
+	end
+	data.Housing.HostBonusCount += 1
+	return true
+end
+
 return IncomeLogic

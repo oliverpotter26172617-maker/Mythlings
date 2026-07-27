@@ -195,13 +195,7 @@ function HousingController:OnStart()
 		end)
 	end
 
-	local toggleGui = UIKit.create("ScreenGui", { Name = "HousingToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("My Plot", Color3.fromRGB(141, 110, 99), {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, 268),
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("My Plot", Color3.fromRGB(141, 110, 99), 268)
 	toggle.Activated:Connect(function()
 		screenGui.Enabled = not screenGui.Enabled
 	end)

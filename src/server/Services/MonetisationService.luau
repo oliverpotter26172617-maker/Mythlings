@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local MonetisationConfig = require(ReplicatedStorage.Shared.Config.MonetisationConfig)
 local MonetisationLogic = require(ReplicatedStorage.Shared.Logic.MonetisationLogic)
+local BattlePassLogic = require(ReplicatedStorage.Shared.Logic.BattlePassLogic)
 local LiveConfig = require(script.Parent.Parent.Lib.LiveConfig)
 
 local MonetisationService = {}
@@ -78,6 +79,12 @@ local function processReceipt(receiptInfo: { [string]: any }): Enum.ProductPurch
 		if product.Def.Type == "Gems" then
 			DataService:MutateCurrency(player, "Gems", product.Def.Amount :: number, `DevProduct:{product.Key}`)
 		elseif product.Def.Type == "BattlePassPremium" then
+			-- Sync to the live season first so premium lands on the current
+			-- season's block. Otherwise, if the player crossed a season
+			-- boundary this session before any pass XP, OwnsPremium would be
+			-- written to the stale block and the next ensureSeason would wipe
+			-- the purchase.
+			BattlePassLogic.ensureSeason(data, BattlePassLogic.seasonIndex(os.time()))
 			data.BattlePass.OwnsPremium = true
 		end
 	end)

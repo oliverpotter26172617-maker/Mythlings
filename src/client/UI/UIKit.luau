@@ -108,4 +108,43 @@ function UIKit.button(text: string, colour: Color3, props: { [string]: any }?): 
 	return button
 end
 
+-- Single shared, left-edge, vertically scrolling toolbar. Every panel toggle
+-- lives here instead of at a fixed Y offset, so buttons reflow and the column
+-- scrolls rather than falling off short or downscaled (mobile) viewports.
+-- `order` fixes the vertical position (lower is higher up).
+local toolbarColumn: any = nil
+
+function UIKit.toolbarButton(text: string, colour: Color3, order: number): TextButton
+	if toolbarColumn == nil then
+		local Players = game:GetService("Players")
+		local playerGui = (Players.LocalPlayer :: Player):WaitForChild("PlayerGui")
+		local gui = UIKit.create("ScreenGui", { Name = "Toolbar", ResetOnSpawn = false })
+		gui.Parent = playerGui
+		toolbarColumn = UIKit.create("ScrollingFrame", {
+			Name = "Column",
+			Size = UDim2.new(0, 122, 0.9, 0),
+			Position = UDim2.new(0, 8, 0.05, 0),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ScrollBarThickness = 4,
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			CanvasSize = UDim2.new(0, 0, 0, 0),
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		})
+		toolbarColumn.Parent = gui
+		local layout = UIKit.create("UIListLayout", {
+			Padding = UDim.new(0, 6),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		})
+		layout.Parent = toolbarColumn
+	end
+	local button = UIKit.button(text, colour, {
+		Size = UDim2.new(1, -6, 0, 40),
+		LayoutOrder = order,
+	})
+	button.Parent = toolbarColumn
+	return button
+end
+
 return UIKit

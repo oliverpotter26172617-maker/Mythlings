@@ -52,6 +52,8 @@ function ProfileSchema.buildTemplate(): { [string]: any }
 			VisitBonusDay = 0,
 			VisitBonusCount = 0,
 			VisitedToday = {},
+			HostBonusDay = 0,
+			HostBonusCount = 0,
 		},
 
 		Cosmetics = {

@@ -179,13 +179,7 @@ function BreedingController:OnStart()
 	})
 	statusLabel.Parent = frame
 
-	local toggleGui = UIKit.create("ScreenGui", { Name = "BreedingToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("Breeding", Color3.fromRGB(171, 71, 188), {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, 76),
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("Breeding", Color3.fromRGB(171, 71, 188), 76)
 	toggle.Activated:Connect(function()
 		if not screenGui.Enabled then
 			local snapshot = ProfileController:Get()

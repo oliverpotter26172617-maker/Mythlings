@@ -111,13 +111,7 @@ function GemShopController:OnStart()
 		end)
 	end
 
-	local toggleGui = UIKit.create("ScreenGui", { Name = "GemShopToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("Gems", Color3.fromRGB(3, 169, 244), {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, 124),
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("Gems", Color3.fromRGB(3, 169, 244), 124)
 	toggle.Activated:Connect(function()
 		screenGui.Enabled = not screenGui.Enabled
 	end)

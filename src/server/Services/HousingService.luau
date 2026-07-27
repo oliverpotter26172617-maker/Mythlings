@@ -284,13 +284,18 @@ function HousingService:OnInit()
 			rootPart.CFrame = CFrame.new(origin + Vector3.new(0, 6, 0))
 		end
 
-		-- Daily bonus for both, once per pair per day (visitor-tracked).
+		-- Daily bonus for both, once per pair per day (visitor-tracked). The
+		-- host is paid on their own daily cap so a popular plot cannot farm
+		-- unbounded Coins from many friends visiting.
 		local granted, message = IncomeLogic.tryRecordVisit(data, friendUserId, os.time())
 		if granted then
 			DataService:MutateCurrency(player, "Coins", HousingConfig.VisitBonusCoins, "VisitBonus:Visitor")
-			DataService:MutateCurrency(friend, "Coins", HousingConfig.VisitBonusCoins, "VisitBonus:Host")
 			DataService:Sync(player)
-			DataService:Sync(friend)
+			local friendData = DataService:GetData(friend)
+			if friendData ~= nil and IncomeLogic.tryRecordHostBonus(friendData, os.time()) then
+				DataService:MutateCurrency(friend, "Coins", HousingConfig.VisitBonusCoins, "VisitBonus:Host")
+				DataService:Sync(friend)
+			end
 		end
 		return { Visited = friend.DisplayName, BonusGranted = granted, Message = message }
 	end)

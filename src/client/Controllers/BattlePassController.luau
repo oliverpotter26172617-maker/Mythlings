@@ -129,13 +129,7 @@ function BattlePassController:OnStart()
 	})
 	statusLabel.Parent = frame
 
-	local toggleGui = UIKit.create("ScreenGui", { Name = "BattlePassToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("Pass", Color3.fromRGB(255, 213, 79), {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, 220),
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("Pass", Color3.fromRGB(255, 213, 79), 220)
 	toggle.Activated:Connect(function()
 		if not screenGui.Enabled then
 			local snapshot = ProfileController:Get()

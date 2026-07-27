@@ -165,13 +165,7 @@ function CollectionController:OnStart()
 	})
 	statusLabel.Parent = frame
 
-	local toggleGui = UIKit.create("ScreenGui", { Name = "CollectionToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("Mythlings", Color3.fromRGB(66, 165, 245), {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, -68),
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("Mythlings", Color3.fromRGB(66, 165, 245), -68)
 	toggle.Activated:Connect(function()
 		if not screenGui.Enabled then
 			local snapshot = ProfileController:Get()
