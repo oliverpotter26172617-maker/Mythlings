@@ -2,10 +2,12 @@
 -- Build-failing config invariants. If a designer edits a config into an
 -- illegal state, this spec stops the commit.
 return function()
+	local ArenaShopConfig = require(script.Parent.ArenaShopConfig)
 	local EggConfig = require(script.Parent.EggConfig)
 	local GrowthConfig = require(script.Parent.GrowthConfig)
 	local HousingConfig = require(script.Parent.HousingConfig)
 	local MythlingConfig = require(script.Parent.MythlingConfig)
+	local NurseryConfig = require(script.Parent.NurseryConfig)
 	local RarityConfig = require(script.Parent.RarityConfig)
 	local StatConfig = require(script.Parent.StatConfig)
 
@@ -131,6 +133,19 @@ return function()
 			for rarity in RarityConfig.IndexByName do
 				expect(HousingConfig.IncomePerHour[rarity]).to.be.a("number")
 			end
+		end)
+	end)
+
+	describe("weekly rotations", function()
+		-- The rotations index pool[(... ) % #pool + 1]; if a per-week count
+		-- exceeds its pool the same item repeats within one week's offers.
+		it("never offer more Nursery Mythlings per week than the pools hold", function()
+			expect(NurseryConfig.EpicsPerWeek <= #NurseryConfig.EpicPool).to.equal(true)
+			expect(NurseryConfig.LegendariesPerWeek <= #NurseryConfig.LegendaryPool).to.equal(true)
+		end)
+
+		it("never offer more Arena Shop slots per week than the pool holds", function()
+			expect(ArenaShopConfig.SlotsPerWeek <= #ArenaShopConfig.Pool).to.equal(true)
 		end)
 	end)
 end
