@@ -99,13 +99,7 @@ function NurseryController:OnStart()
 		end
 	end
 
-	local toggleGui = UIKit.create("ScreenGui", { Name = "NurseryToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("Nursery", Color3.fromRGB(255, 138, 101), {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, 172),
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("Nursery", Color3.fromRGB(255, 138, 101), 172)
 	toggle.Activated:Connect(function()
 		if not screenGui.Enabled then
 			rebuild()

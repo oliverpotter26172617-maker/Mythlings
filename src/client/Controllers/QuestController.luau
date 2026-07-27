@@ -192,13 +192,7 @@ function QuestController:OnStart()
 	})
 	statusLabel.Parent = frame
 
-	local toggleGui = UIKit.create("ScreenGui", { Name = "QuestsToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("Quests", Color3.fromRGB(77, 182, 172), {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, 316),
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("Quests", Color3.fromRGB(77, 182, 172), 316)
 	toggle.Activated:Connect(function()
 		if not screenGui.Enabled then
 			local snapshot = ProfileController:Get()

@@ -180,13 +180,7 @@ function EggShopController:OnStart()
 	buildShop()
 
 	-- Toggle button on the main screen.
-	local toggleGui = UIKit.create("ScreenGui", { Name = "EggShopToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("Egg Shop", UIKit.Palette.Accent, {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, -20),
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("Egg Shop", UIKit.Palette.Accent, -20)
 	toggle.Activated:Connect(function()
 		screenGui.Enabled = not screenGui.Enabled
 	end)

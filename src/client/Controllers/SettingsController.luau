@@ -88,14 +88,8 @@ function SettingsController:OnStart()
 		end)
 	end
 
-	local toggleGui = UIKit.create("ScreenGui", { Name = "SettingsToggle", ResetOnSpawn = false })
-	toggleGui.Parent = playerGui
-	local toggle = UIKit.button("Settings", UIKit.Palette.PanelLight, {
-		Size = UDim2.new(0, 110, 0, 40),
-		Position = UDim2.new(0, 12, 0.5, -116),
-		TextColor3 = UIKit.Palette.Text,
-	})
-	toggle.Parent = toggleGui
+	local toggle = UIKit.toolbarButton("Settings", UIKit.Palette.PanelLight, -116)
+	toggle.TextColor3 = UIKit.Palette.Text
 	toggle.Activated:Connect(function()
 		playClick()
 		screenGui.Enabled = not screenGui.Enabled
