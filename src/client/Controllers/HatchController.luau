@@ -43,7 +43,9 @@ local function showReveal(result: { [string]: any })
 	})
 	layout.Parent = revealFrame
 
-	local colour = RarityConfig.Colours[result.Rarity]
+	-- Fall back to a neutral colour if the server ever sends a rarity this
+	-- client build does not know, rather than erroring the whole reveal.
+	local colour = RarityConfig.Colours[result.Rarity] or { R = 238, G = 238, B = 238 }
 	local rarityLabel = UIKit.label(result.Rarity .. "!", 26, {
 		Size = UDim2.new(1, 0, 0, 34),
 		Font = Enum.Font.GothamBold,
