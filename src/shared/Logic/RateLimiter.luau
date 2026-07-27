@@ -1,7 +1,9 @@
 --!strict
--- Token-bucket rate limiter, pure Luau. Each key (we use "RemoteName:UserId")
+-- Token-bucket rate limiter, pure Luau. Each key (Net uses "UserId:RemoteName")
 -- gets a bucket with a burst capacity that refills continuously. The clock is
--- a parameter so tests can drive time deterministically.
+-- a parameter so tests can drive time deterministically. clear() matches by
+-- key prefix, so callers put the per-player portion first with a trailing
+-- delimiter to release all of a player's buckets on leave.
 
 local RateLimiter = {}
 RateLimiter.__index = RateLimiter

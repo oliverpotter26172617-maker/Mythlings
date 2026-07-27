@@ -170,6 +170,10 @@ function ProfileSchema.runMigrations(
 		table.insert(applied, version)
 	end
 
+	-- Stamp the version even on the no-op path (from == target), so a profile
+	-- that needed no migration still records the current schema version
+	-- rather than leaving it unset for template reconciliation to fill in.
+	data.SchemaVersion = target
 	return applied
 end
 

@@ -149,6 +149,11 @@ local function buildBattleHud(payload: { [string]: any })
 				continue -- the basic attack fires automatically
 			end
 			local ability = AbilityConfig.Abilities[abilityId]
+			if ability == nil then
+				-- Unknown ability id from the server: skip its button rather
+				-- than erroring the whole battle HUD.
+				continue
+			end
 			local button = UIKit.button(ability.DisplayName, UIKit.Palette.Accent, {
 				Size = UDim2.new(0, 130, 1, 0),
 				TextSize = 13,

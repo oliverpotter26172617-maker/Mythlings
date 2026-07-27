@@ -191,6 +191,17 @@ function DataService:Sync(player: Player)
 	end)
 end
 
+-- Forces an immediate profile save instead of waiting for the periodic
+-- autosave. Use after high-value mutations (paid receipts) so a crash in the
+-- seconds after the grant cannot lose it. No-op if the profile is not loaded;
+-- ProfileStore performs the save on its own thread.
+function DataService:Save(player: Player)
+	local profile = profiles[player]
+	if profile then
+		profile:Save()
+	end
+end
+
 function DataService:GetBalance(player: Player, currency: string): number?
 	local data = self:GetData(player)
 	if data == nil then

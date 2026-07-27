@@ -34,7 +34,18 @@ local function rebuild(snapshot: { [string]: any })
 			child:Destroy()
 		end
 	end
-	selected = {}
+
+	-- Preserve any in-progress selection whose Mythling is still breedable,
+	-- so a background profile sync (idle income, a hatch elsewhere) cannot
+	-- wipe the player's picks mid-selection.
+	local kept: { string } = {}
+	for _, id in selected do
+		local record = snapshot.Mythlings[id]
+		if record ~= nil and (record.Stage == "Adult" or record.Stage == "Alpha") then
+			table.insert(kept, id)
+		end
+	end
+	selected = kept
 	refreshBreedButton()
 
 	local ids = {}
@@ -50,6 +61,11 @@ local function rebuild(snapshot: { [string]: any })
 	for _, mythlingId in ids do
 		local record = snapshot.Mythlings[mythlingId]
 		local species = MythlingConfig.Species[record.SpeciesId]
+		if species == nil then
+			-- A species retired from config while still owned: skip it rather
+			-- than blanking the whole panel.
+			continue
+		end
 		local resting = record.BreedCooldownUntil > now
 
 		local labelText = species.DisplayName
@@ -67,6 +83,9 @@ local function rebuild(snapshot: { [string]: any })
 			TextSize = 14,
 		})
 		entry.Parent = listFrame
+		if table.find(selected, mythlingId) then
+			entry.BackgroundColor3 = UIKit.Palette.Accent
+		end
 
 		entry.Activated:Connect(function()
 			if resting then
@@ -142,7 +161,7 @@ function BreedingController:OnStart()
 		Position = UDim2.new(0.2, 0, 1, -68),
 	})
 	breedButton.Parent = frame
-	breedButton.Activated:Connect(function()
+	UIKit.onActivated(breedButton, function()
 		if #selected ~= 2 then
 			return
 		end
@@ -168,14 +187,22 @@ function BreedingController:OnStart()
 	})
 	toggle.Parent = toggleGui
 	toggle.Activated:Connect(function()
+		if not screenGui.Enabled then
+			local snapshot = ProfileController:Get()
+			if snapshot then
+				rebuild(snapshot)
+			end
+		end
 		screenGui.Enabled = not screenGui.Enabled
 	end)
 
-	ProfileController.Changed:Connect(rebuild)
-	local existing = ProfileController:Get()
-	if existing then
-		rebuild(existing)
-	end
+	-- Only rebuild while the panel is open, so a background sync cannot churn
+	-- the list (or disturb the selection) when the player is not looking.
+	ProfileController.Changed:Connect(function(snapshot)
+		if screenGui.Enabled then
+			rebuild(snapshot)
+		end
+	end)
 end
 
 return BreedingController

@@ -32,8 +32,11 @@ local function getFolder(): Folder
 		remotesFolder = folder
 
 		Players.PlayerRemoving:Connect(function(player)
+			-- Buckets are keyed "UserId:RemoteName"; the trailing colon keeps
+			-- the prefix from matching a different user whose id starts the
+			-- same (e.g. 12 must not clear 123).
 			for _, limiter in limiters do
-				limiter:clear(`:{player.UserId}`)
+				limiter:clear(`{player.UserId}:`)
 			end
 		end)
 	end
@@ -74,7 +77,7 @@ local function checkRate(name: string, def: RemoteConfig.RemoteDef, player: Play
 		limiter = RateLimiter.new(def.Burst, def.PerMinute / 60)
 		limiters[name] = limiter
 	end
-	return limiter:allow(`{name}:{player.UserId}`, os.clock())
+	return limiter:allow(`{player.UserId}:{name}`, os.clock())
 end
 
 -- Registers the server handler for a client->server RemoteEvent.

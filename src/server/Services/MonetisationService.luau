@@ -74,7 +74,7 @@ local function processReceipt(receiptInfo: { [string]: any }): Enum.ProductPurch
 	end
 
 	local receiptId = tostring(receiptInfo.PurchaseId)
-	MonetisationLogic.applyReceiptOnce(data, receiptId, os.time(), function()
+	local granted = MonetisationLogic.applyReceiptOnce(data, receiptId, os.time(), function()
 		if product.Def.Type == "Gems" then
 			DataService:MutateCurrency(player, "Gems", product.Def.Amount :: number, `DevProduct:{product.Key}`)
 		elseif product.Def.Type == "BattlePassPremium" then
@@ -84,6 +84,12 @@ local function processReceipt(receiptInfo: { [string]: any }): Enum.ProductPurch
 	-- Replays fall through here too: the grant already happened once, so
 	-- the receipt is settled either way.
 	DataService:Sync(player)
+	if granted then
+		-- Force the ledger write and grant to disk now. Otherwise a crash
+		-- before the next autosave would lose a purchase Roblox has already
+		-- marked delivered and will never redeliver.
+		DataService:Save(player)
+	end
 	return Enum.ProductPurchaseDecision.PurchaseGranted
 end
 

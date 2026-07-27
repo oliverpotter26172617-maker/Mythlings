@@ -43,7 +43,9 @@ local function showReveal(result: { [string]: any })
 	})
 	layout.Parent = revealFrame
 
-	local colour = RarityConfig.Colours[result.Rarity]
+	-- Fall back to a neutral colour if the server ever sends a rarity this
+	-- client build does not know, rather than erroring the whole reveal.
+	local colour = RarityConfig.Colours[result.Rarity] or { R = 238, G = 238, B = 238 }
 	local rarityLabel = UIKit.label(result.Rarity .. "!", 26, {
 		Size = UDim2.new(1, 0, 0, 34),
 		Font = Enum.Font.GothamBold,
@@ -129,7 +131,7 @@ local function rebuildList(snapshot: { [string]: any })
 		})
 		action.Parent = row
 
-		action.Activated:Connect(function()
+		UIKit.onActivated(action, function()
 			local current = (ProfileController:Get() :: any).Eggs[eggId]
 			if current == nil then
 				return
@@ -243,14 +245,22 @@ function HatchController:OnStart()
 	})
 	toggle.Parent = toggleGui
 	toggle.Activated:Connect(function()
+		if not screenGui.Enabled then
+			local snapshot = ProfileController:Get()
+			if snapshot then
+				rebuildList(snapshot)
+			end
+		end
 		screenGui.Enabled = not screenGui.Enabled
 	end)
 
-	ProfileController.Changed:Connect(rebuildList)
-	local existing = ProfileController:Get()
-	if existing then
-		rebuildList(existing)
-	end
+	-- Rebuild only while the panel is open; the timer loop below already
+	-- refreshes countdowns on the same condition.
+	ProfileController.Changed:Connect(function(snapshot)
+		if screenGui.Enabled then
+			rebuildList(snapshot)
+		end
+	end)
 
 	local accumulator = 0
 	RunService.Heartbeat:Connect(function(dt)

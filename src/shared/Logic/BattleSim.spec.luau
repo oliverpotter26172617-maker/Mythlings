@@ -138,6 +138,44 @@ return function()
 		end)
 	end)
 
+	describe("deterministic across step granularity", function()
+		it("gives an identical result whether run to completion, small-stepped or frame-stepped", function()
+			local function buildTeams()
+				-- Fresh, identically-seeded rng so the teams match across runs.
+				local teamRng = makeRng(4242)
+				return randomTeam(teamRng, "A"), randomTeam(teamRng, "B")
+			end
+			local function runWith(stepper)
+				local teamA, teamB = buildTeams()
+				local sim = BattleSim.new(teamA, teamB, makeRng(99))
+				stepper(sim)
+				return sim:getResult()
+			end
+
+			local full = runWith(function(sim)
+				sim:runToCompletion()
+			end)
+			local smallSteps = runWith(function(sim)
+				while not sim:isFinished() do
+					sim:step(0.1)
+				end
+			end)
+			local frameSteps = runWith(function(sim)
+				while not sim:isFinished() do
+					sim:step(1 / 60)
+				end
+			end)
+
+			for _, other in { smallSteps, frameSteps } do
+				expect(other.Winner).to.equal(full.Winner)
+				expect(other.Duration).to.equal(full.Duration)
+				expect(other.TimedOut).to.equal(full.TimedOut)
+				expect(other.TeamHpFraction[1]).to.equal(full.TeamHpFraction[1])
+				expect(other.TeamHpFraction[2]).to.equal(full.TeamHpFraction[2])
+			end
+		end)
+	end)
+
 	describe("timeout handling", function()
 		it("awards the higher HP fraction team at the cap", function()
 			-- Two tanks that cannot meaningfully hurt each other quickly.

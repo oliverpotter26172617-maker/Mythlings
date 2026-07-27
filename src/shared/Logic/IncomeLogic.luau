@@ -44,6 +44,12 @@ function IncomeLogic.claim(data: { [string]: any }, now: number): number
 		return 0
 	end
 	local coins = IncomeLogic.computeIncome(data, now)
+	if coins <= 0 then
+		-- Less than a whole coin has accrued. Leave the clock untouched so
+		-- the sub-coin fraction keeps building; advancing it here would floor
+		-- it away and a player claiming frequently would never earn anything.
+		return 0
+	end
 	data.Housing.LastIncomeClaimAt = now
 	return coins
 end

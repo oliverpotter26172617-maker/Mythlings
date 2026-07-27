@@ -86,7 +86,7 @@ function NurseryController:OnStart()
 				}
 			)
 			entry.Parent = listFrame
-			entry.Activated:Connect(function()
+			UIKit.onActivated(entry, function()
 				local response = NetClient.Invoke("BuyNurseryMythling", index)
 				if response.Ok then
 					statusLabel.Text = `{species.DisplayName} joined your collection!`

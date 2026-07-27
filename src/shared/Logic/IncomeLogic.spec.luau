@@ -63,6 +63,18 @@ return function()
 			expect(IncomeLogic.claim(data, 5000)).to.equal(0)
 			expect(data.Housing.LastIncomeClaimAt).to.equal(5000)
 		end)
+
+		it("keeps the clock when less than a whole coin has accrued", function()
+			local data = freshData(1000)
+			-- A minute accrues under one coin at these rates, flooring to 0.
+			expect(IncomeLogic.claim(data, 1000 + 60)).to.equal(0)
+			expect(data.Housing.LastIncomeClaimAt).to.equal(1000)
+			-- An hour after the original claim still pays the full hour, so the
+			-- earlier sub-coin claim did not discard the accrual.
+			local expected = HousingConfig.IncomePerHour.Common + HousingConfig.IncomePerHour.Epic
+			expect(IncomeLogic.claim(data, 1000 + 3600)).to.equal(expected)
+			expect(data.Housing.LastIncomeClaimAt).to.equal(1000 + 3600)
+		end)
 	end)
 
 	describe("IncomeLogic.tryRecordVisit", function()

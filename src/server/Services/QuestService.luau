@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local MythlingConfig = require(ReplicatedStorage.Shared.Config.MythlingConfig)
 local QuestConfig = require(ReplicatedStorage.Shared.Config.QuestConfig)
+local RaidConfig = require(ReplicatedStorage.Shared.Config.RaidConfig)
 local StatConfig = require(ReplicatedStorage.Shared.Config.StatConfig)
 local Guard = require(ReplicatedStorage.Shared.Logic.Guard)
 local HatchLogic = require(ReplicatedStorage.Shared.Logic.HatchLogic)
@@ -23,22 +24,22 @@ local function rng(): number
 	return serverRandom:NextNumber()
 end
 
--- Grants the day-7 guaranteed Epic egg: a sealed outcome rolled now.
-local function grantEpicEgg(data: { [string]: any })
+-- Grants the day-7 guaranteed Epic egg: a sealed outcome rolled now. Falls
+-- back to Coins if the player's egg storage is full, so the reward cannot
+-- exceed MaxStoredEggs. Returns the itemised grant for the client toast.
+local function grantEpicEgg(player: Player, data: { [string]: any }): { [string]: any }
 	local speciesId = HatchLogic.pickSpecies(MythlingConfig.Species, "Epic", nil, 0.5, rng)
-	local eggId = `E{data.NextEggId}`
-	data.NextEggId += 1
-	data.Eggs[eggId] = {
-		Tier = "Gift",
-		ObtainedAt = os.time(),
-		HatchesAt = nil,
-		HatchMinutes = QuestConfig.CalendarEggHatchMinutes,
-		Outcome = {
-			SpeciesId = speciesId,
-			Potential = HatchLogic.rollPotential(StatConfig.PotentialMin, StatConfig.PotentialMax, rng),
-			Shiny = false,
-		},
+	local outcome = {
+		SpeciesId = speciesId,
+		Potential = HatchLogic.rollPotential(StatConfig.PotentialMin, StatConfig.PotentialMax, rng),
+		Shiny = false,
 	}
+	local stored = Grants.trySealedEgg(data, "Gift", QuestConfig.CalendarEggHatchMinutes, outcome, os.time())
+	if stored then
+		return { Type = "Egg", Id = "Guaranteed Epic", Count = 1 }
+	end
+	DataService:MutateCurrency(player, "Coins", RaidConfig.EggFallbackCoins, "Calendar:EpicEggFallback")
+	return { Type = "Coins", Id = nil, Count = RaidConfig.EggFallbackCoins }
 end
 
 -- Public: adds quest progress for a metric. Cheap when nothing matches.
@@ -139,8 +140,7 @@ function QuestService:OnStart()
 		if dayIndex ~= nil and reward ~= nil then
 			local granted
 			if reward.Type == "EpicEgg" then
-				grantEpicEgg(data)
-				granted = { Type = "Egg", Id = "Guaranteed Epic", Count = 1 }
+				granted = grantEpicEgg(player, data)
 			else
 				granted = Grants.grant(DataService, player, data, reward :: any, `Calendar:Day{dayIndex}`)
 			end

@@ -59,4 +59,35 @@ function Grants.grant(
 	error(`Grants.grant: unknown item type {item.Type}`)
 end
 
+-- Stores a pre-rolled "sealed" egg (calendar day-7 Epic, onboarding starter)
+-- while respecting MaxStoredEggs, so these bonus grants cannot push a player
+-- over the storage cap that the shop, hatch and gift paths all enforce.
+-- Returns true if the egg was stored, false if storage was full so the
+-- caller can decide the fallback (coins, or retry later).
+function Grants.trySealedEgg(
+	data: { [string]: any },
+	tier: string,
+	hatchMinutes: number,
+	outcome: { [string]: any },
+	now: number
+): boolean
+	local eggCount = 0
+	for _ in data.Eggs do
+		eggCount += 1
+	end
+	if eggCount >= PlayerConfig.MaxStoredEggs then
+		return false
+	end
+	local eggId = `E{data.NextEggId}`
+	data.NextEggId += 1
+	data.Eggs[eggId] = {
+		Tier = tier,
+		ObtainedAt = now,
+		HatchesAt = nil,
+		HatchMinutes = hatchMinutes,
+		Outcome = outcome,
+	}
+	return true
+end
+
 return Grants

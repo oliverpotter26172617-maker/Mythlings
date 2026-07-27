@@ -86,10 +86,13 @@ function RewardsLogic.compute(input: RewardInput): RewardResult
 	-- XP
 	local xp = math.floor(RewardsConfig.BaseBattleXp * row.XpFraction)
 
-	-- Streaks: draws freeze both.
+	-- Streaks are a ranked-only concept: they drive the ranked coin bonus
+	-- and ranked loss protection, and there is a single streak pair in the
+	-- profile. Non-ranked modes (Casual, Raid) and draws freeze both, so a
+	-- casual or raid run cannot feed the ranked streak.
 	local newWinStreak = input.PriorWinStreak
 	local newLossStreak = input.PriorLossStreak
-	if not isDraw then
+	if input.Mode == "Ranked" and not isDraw then
 		if isWin then
 			newWinStreak += 1
 			newLossStreak = 0

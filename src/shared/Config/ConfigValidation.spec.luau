@@ -2,8 +2,12 @@
 -- Build-failing config invariants. If a designer edits a config into an
 -- illegal state, this spec stops the commit.
 return function()
+	local ArenaShopConfig = require(script.Parent.ArenaShopConfig)
 	local EggConfig = require(script.Parent.EggConfig)
+	local GrowthConfig = require(script.Parent.GrowthConfig)
+	local HousingConfig = require(script.Parent.HousingConfig)
 	local MythlingConfig = require(script.Parent.MythlingConfig)
+	local NurseryConfig = require(script.Parent.NurseryConfig)
 	local RarityConfig = require(script.Parent.RarityConfig)
 	local StatConfig = require(script.Parent.StatConfig)
 
@@ -88,6 +92,60 @@ return function()
 					expect(elements[tier.ElementBias]).to.equal(true)
 				end
 			end
+		end)
+	end)
+
+	describe("stat and growth tables", function()
+		it("define a stage multiplier and scale for every stage", function()
+			-- StatCalc asserts on these; a missing stage would crash a hatch.
+			for _, stage in StatConfig.StageOrder do
+				expect(StatConfig.StageMultipliers[stage]).to.be.a("number")
+				expect(StatConfig.StageScales[stage]).to.be.a("number")
+			end
+		end)
+
+		it("define a rarity budget for every known rarity", function()
+			for rarity in RarityConfig.IndexByName do
+				expect(StatConfig.RarityBudgets[rarity]).to.be.a("number")
+			end
+		end)
+
+		it("have XP thresholds for every stage, non-decreasing along StageOrder", function()
+			-- GrowthLogic.stageForXp walks StageOrder assuming thresholds rise.
+			local previous = -math.huge
+			for _, stage in StatConfig.StageOrder do
+				local threshold = GrowthConfig.StageThresholds[stage]
+				expect(threshold).to.be.a("number")
+				expect(threshold >= previous).to.equal(true)
+				previous = threshold
+			end
+		end)
+	end)
+
+	describe("housing tables", function()
+		it("cap furniture for every plot tier", function()
+			-- HousingLogic.canPlace indexes MaxFurniture[plotTier]; a missing
+			-- entry would throw on a legitimate placement.
+			expect(#HousingConfig.MaxFurniture).to.equal(#HousingConfig.PlotTiers)
+		end)
+
+		it("set an idle income rate for every known rarity", function()
+			for rarity in RarityConfig.IndexByName do
+				expect(HousingConfig.IncomePerHour[rarity]).to.be.a("number")
+			end
+		end)
+	end)
+
+	describe("weekly rotations", function()
+		-- The rotations index pool[(... ) % #pool + 1]; if a per-week count
+		-- exceeds its pool the same item repeats within one week's offers.
+		it("never offer more Nursery Mythlings per week than the pools hold", function()
+			expect(NurseryConfig.EpicsPerWeek <= #NurseryConfig.EpicPool).to.equal(true)
+			expect(NurseryConfig.LegendariesPerWeek <= #NurseryConfig.LegendaryPool).to.equal(true)
+		end)
+
+		it("never offer more Arena Shop slots per week than the pool holds", function()
+			expect(ArenaShopConfig.SlotsPerWeek <= #ArenaShopConfig.Pool).to.equal(true)
 		end)
 	end)
 end
