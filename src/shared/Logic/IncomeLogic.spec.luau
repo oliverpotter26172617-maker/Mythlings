@@ -77,6 +77,22 @@ return function()
 		end)
 	end)
 
+	describe("IncomeLogic.tryRecordHostBonus", function()
+		it("pays the host up to the daily cap then stops, resetting daily", function()
+			local data = freshData(0)
+			local day1 = 86400 * 200
+			local paid = 0
+			for i = 1, HousingConfig.VisitBonusDailyCap + 3 do
+				if IncomeLogic.tryRecordHostBonus(data, day1 + i) then
+					paid += 1
+				end
+			end
+			expect(paid).to.equal(HousingConfig.VisitBonusDailyCap)
+			-- The next day resets the host's allowance.
+			expect(IncomeLogic.tryRecordHostBonus(data, day1 + 86400)).to.equal(true)
+		end)
+	end)
+
 	describe("IncomeLogic.tryRecordVisit", function()
 		it("pays once per friend per day up to the cap, resetting daily", function()
 			local data = freshData(0)
